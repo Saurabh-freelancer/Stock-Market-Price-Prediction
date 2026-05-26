@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}My Portfolio{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-pie me-2"></i>My Portfolio</h2>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" onclick="refreshPortfolio()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="addToPortfolio()">
+                        <i class="fas fa-plus me-1"></i>Add Stock
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Total Value</h6>
+                            <h4 id="totalValue">$0.00</h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Total Gain/Loss</h6>
+                            <h4 id="totalGainLoss">$0.00</h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Total Return</h6>
+                            <h4 id="totalReturn">0.00%</h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-percentage fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Stocks Tracked</h6>
+                            <h4 id="stocksCount">{{ predictions|length }}</h4>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-list fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-table me-2"></i>Portfolio Holdings</h5>
+                </div>
+                <div class="card-body">
+                    {% if predictions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Predicted Price</th>
+                                    <th>Current Price</th>
+                                    <th>Accuracy</th>
+                                    <th>Direction</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="portfolioTable">
+                                {% for prediction in predictions %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ prediction.symbol }}</strong>
+                                    </td>
+                                    <td>${{ "%.2f"|format(prediction.predicted_price) }}</td>
+                                    <td id="current-{{ prediction.symbol }}">Loading...</td>
+                                    <td id="accuracy-{{ prediction.symbol }}">-</td>
+                                    <td id="direction-{{ prediction.symbol }}">
+                                        <span class="badge bg-secondary">-</span>
+                                    </td>
+                                    <td>{{ prediction.created_at.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewDetails('{{ prediction.symbol }}')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromPortfolio('{{ prediction.id }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No stocks in your portfolio yet</h5>
+                        <p class="text-muted">Start by making some predictions to track your portfolio performance.</p>
+                        <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Make Prediction
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Chart -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-area me-2"></i>Portfolio Performance</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="portfolioChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load portfolio performance data
+function loadPortfolioPerformance() {
+    fetch('/api/portfolio-performance')
+        .then(response => response.json())
+        .then(data => {
+            updatePortfolioTable(data);
+            updatePortfolioSummary(data);
+            updatePortfolioChart(data);
+        })
+        .catch(error => {
+            console.error('Error loading portfolio performance:', error);
+        });
+}
+
+function updatePortfolioTable(data) {
+    data.forEach(item => {
+        const currentPriceElement = document.getElementById(`current-${item.symbol}`);
+        const accuracyElement = document.getElementById(`accuracy-${item.symbol}`);
+        const directionElement = document.getElementById(`direction-${item.symbol}`);
+        
+        if (currentPriceElement) {
+            currentPriceElement.textContent = `$${item.current_price.toFixed(2)}`;
+        }
+        if (accuracyElement) {
+            accuracyElement.textContent = `${item.accuracy}%`;
+        }
+        if (directionElement) {
+            const badgeClass = item.direction === 'bullish' ? 'bg-success' : 'bg-danger';
+            directionElement.innerHTML = `<span class="badge ${badgeClass}">${item.direction}</span>`;
+        }
+    });
+}
+
+function updatePortfolioSummary(data) {
+    let totalValue = 0;
+    let totalGainLoss = 0;
+    let totalReturn = 0;
+    
+    data.forEach(item => {
+        totalValue += item.current_price;
+        totalGainLoss += (item.current_price - item.predicted_price);
+        totalReturn += item.accuracy;
+    });
+    
+    document.getElementById('totalValue').textContent = `$${totalValue.toFixed(2)}`;
+    document.getElementById('totalGainLoss').textContent = `$${totalGainLoss.toFixed(2)}`;
+    document.getElementById('totalReturn').textContent = `${(totalReturn / data.length).toFixed(2)}%`;
+}
+
+function updatePortfolioChart(data) {
+    const ctx = document.getElementById('portfolioChart').getContext('2d');
+    
+    const labels = data.map(item => item.symbol);
+    const predictedPrices = data.map(item => item.predicted_price);
+    const currentPrices = data.map(item => item.current_price);
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Predicted Price',
+                data: predictedPrices,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Current Price',
+                data: currentPrices,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function refreshPortfolio() {
+    loadPortfolioPerformance();
+}
+
+function addToPortfolio() {
+    window.location.href = '{{ url_for("predict") }}';
+}
+
+function viewDetails(symbol) {
+    window.location.href = `{{ url_for("predict") }}?symbol=${symbol}`;
+}
+
+function removeFromPortfolio(predictionId) {
+    if (confirm('Are you sure you want to remove this prediction from your portfolio?')) {
+        // Add API call to remove prediction
+        fetch(`/remove-prediction/${predictionId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+        });
+    }
+}
+
+// Load data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadPortfolioPerformance();
+    
+    // Refresh every 30 seconds
+    setInterval(loadPortfolioPerformance, 30000);
+});
+</script>
+{% endblock %}

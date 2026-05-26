@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block title %}{{ symbol }} Analysis - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+<div class="main-content" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-chart-bar me-2"></i>{{ symbol }} Analysis
+            </h1>
+            <p class="text-muted mb-0">{{ info.longName if info else symbol }} - Comprehensive stock analysis</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" onclick="refreshAnalysis()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+            <a href="{{ url_for('predict') }}?symbol={{ symbol }}" class="btn btn-primary">
+                <i class="fas fa-crystal-ball me-2"></i>Predict Price
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Overview -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="100">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <h3 class="text-primary">{{ symbol }}</h3>
+                            <h5 class="text-muted">{{ info.longName if info else 'Company Name' }}</h5>
+                            <p class="text-muted">{{ info.sector if info else 'Sector' }} • {{ info.industry if info else 'Industry' }}</p>
+                        </div>
+                        <div class="text-end">
+                            <h2 class="text-dark" id="current-price">${{ "%.2f"|format(info.currentPrice if info else 0) }}</h2>
+                            <div class="d-flex align-items-center justify-content-end">
+                                <span class="badge" id="change-badge">Loading...</span>
+                                <span class="ms-2" id="change-text">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stock Chart -->
+                    <div id="stock-chart" style="height: 400px;">
+                        {% if chart %}
+                            <div id="chart-container"></div>
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-line text-muted fa-3x mb-3"></i>
+                                    <p class="text-muted">Chart loading...</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Key Metrics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-key me-2"></i>Key Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Market Cap</h6>
+                                <p class="mb-0 fw-bold">${{ "{:.1f}B".format(info.marketCap / 1000000000) if info and info.marketCap else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Volume</h6>
+                                <p class="mb-0 fw-bold">{{ "{:.1f}M".format(info.volume / 1000000) if info and info.volume else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">P/E Ratio</h6>
+                                <p class="mb-0 fw-bold">{{ "%.2f"|format(info.trailingPE) if info and info.trailingPE else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">52W High</h6>
+                                <p class="mb-0 fw-bold">${{ "%.2f"|format(info.fiftyTwoWeekHigh) if info and info.fiftyTwoWeekHigh else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">52W Low</h6>
+                                <p class="mb-0 fw-bold">${{ "%.2f"|format(info.fiftyTwoWeekLow) if info and info.fiftyTwoWeekLow else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Beta</h6>
+                                <p class="mb-0 fw-bold">{{ "%.2f"|format(info.beta) if info and info.beta else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sentiment Analysis -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-smile me-2"></i>Market Sentiment</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="sentiment-circle mx-auto mb-3" id="sentiment-circle">
+                            <div class="sentiment-score" id="sentiment-score">{{ "%.1f"|format(sentiment_score * 100) if sentiment_score else 0 }}</div>
+                            <div class="sentiment-label" id="sentiment-label">
+                                {% if sentiment_score > 0.1 %}Positive
+                                {% elif sentiment_score < -0.1 %}Negative
+                                {% else %}Neutral{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar" id="sentiment-progress"
+                             style="width: {{ (sentiment_score + 1) * 50 if sentiment_score else 50 }}%"></div>
+                    </div>
+                    <small class="text-muted">Based on recent news and social media sentiment</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Technical Indicators -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="200">
+    <h3 class="mb-4">
+        <i class="fas fa-signal me-2"></i>Technical Indicators
+    </h3>
+    <div class="row">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">RSI (14)</h6>
+                    <h4 class="text-primary" id="rsi-value">{{ "%.2f"|format(indicators.RSI) if indicators.RSI else 'N/A' }}</h4>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar" id="rsi-progress"
+                             style="width: {{ (indicators.RSI / 100 * 100) if indicators.RSI else 0 }}%"></div>
+                    </div>
+                    <small class="text-muted" id="rsi-signal">
+                        {% if indicators.RSI > 70 %}Overbought
+                        {% elif indicators.RSI < 30 %}Oversold
+                        {% else %}Neutral{% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">MACD</h6>
+                    <h4 class="text-success" id="macd-value">{{ "%.4f"|format(indicators.MACD) if indicators.MACD else 'N/A' }}</h4>
+                    <small class="text-muted" id="macd-signal">
+                        {% if indicators.MACD > 0 %}Bullish
+                        {% else %}Bearish{% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">SMA 20</h6>
+                    <h4 class="text-info" id="sma20-value">${{ "%.2f"|format(indicators.SMA_20) if indicators.SMA_20 else 'N/A' }}</h4>
+                    <small class="text-muted" id="sma20-signal">
+                        {% if indicators.SMA_20 and info.currentPrice %}
+                            {% if info.currentPrice > indicators.SMA_20 %}Above
+                            {% else %}Below{% endif %}
+                        {% else %}N/A{% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Stochastic %K</h6>
+                    <h4 class="text-warning" id="stoch-value">{{ "%.2f"|format(indicators.Stoch_K) if indicators.Stoch_K else 'N/A' }}</h4>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-warning" id="stoch-progress"
+                            style="width: {{ (indicators.Stoch_K) if indicators.Stoch_K else 0 }}%"></div>
+                    </div>
+                    <small class="text-muted" id="stoch-signal">
+                        {% if indicators.Stoch_K > 80 %}Overbought
+                        {% elif indicators.Stoch_K < 20 %}Oversold
+                        {% else %}Neutral{% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trading Signals -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="300">
+    <h3 class="mb-4">
+        <i class="fas fa-bullhorn me-2"></i>Trading Signals
+    </h3>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Technical Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <div id="technical-signals">
+                        <!-- Signals will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Sentiment Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <div id="sentiment-signals">
+                        <!-- Sentiment signals will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Company Information -->
+{% if info %}
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="400">
+    <h3 class="mb-4">
+        <i class="fas fa-building me-2"></i>Company Information
+    </h3>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">Business Summary</h6>
+                    <p class="mb-3">{{ info.longBusinessSummary[:300] + '...' if info.longBusinessSummary and info.longBusinessSummary|length > 300 else info.longBusinessSummary or 'No summary available' }}</p>
+                    
+                    <h6 class="text-muted">Key Details</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Sector:</strong> {{ info.sector or 'N/A' }}</li>
+                        <li><strong>Industry:</strong> {{ info.industry or 'N/A' }}</li>
+                        <li><strong>Employees:</strong> {{ "{:,}".format(info.fullTimeEmployees) if info.fullTimeEmployees else 'N/A' }}</li>
+                        <li><strong>Website:</strong> 
+                            {% if info.website %}
+                                <a href="{{ info.website }}" target="_blank">{{ info.website }}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="text-muted">Financial Metrics</h6>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Revenue</h6>
+                                <p class="mb-0 fw-bold">${{ "{:.1f}B".format(info.totalRevenue / 1000000000) if info.totalRevenue else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Profit Margin</h6>
+                                <p class="mb-0 fw-bold">{{ "%.1f"|format(info.profitMargins * 100) if info.profitMargins else 'N/A' }}%</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">ROE</h6>
+                                <p class="mb-0 fw-bold">{{ "%.1f"|format(info.returnOnEquity * 100) if info.returnOnEquity else 'N/A' }}%</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center">
+                                <h6 class="text-muted">Debt to Equity</h6>
+                                <p class="mb-0 fw-bold">{{ "%.2f"|format(info.debtToEquity) if info.debtToEquity else 'N/A' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="main-content" data-aos="fade-up" data-aos-delay="500">
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('predict') }}?symbol={{ symbol }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-crystal-ball me-2"></i>Predict Price
+        </a>
+        <button class="btn btn-outline-success btn-lg" onclick="addToWatchlist('{{ symbol }}')">
+            <i class="fas fa-eye me-2"></i>Add to Watchlist
+        </button>
+        <a href="{{ url_for('market_overview') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-globe me-2"></i>Market Overview
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-info btn-lg">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let chart = null;
+
+function refreshAnalysis() {
+    location.reload();
+}
+
+function addToWatchlist(symbol) {
+    if (confirm(`Add ${symbol} to your watchlist?`)) {
+        fetch('/watchlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `symbol=${symbol}&notes=`
+        })
+        .then(response => {
+            if (response.ok) {
+                alert(`${symbol} added to watchlist!`);
+            } else {
+                alert('Please login to add to watchlist');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Please login to add to watchlist');
+        });
+    }
+}
+
+function generateTradingSignals() {
+    const rsi = {{ indicators.RSI if indicators.RSI else 0 }};
+    const macd = {{ indicators.MACD if indicators.MACD else 0 }};
+    const sentiment = {{ sentiment_score if sentiment_score else 0 }};
+    
+    let signals = [];
+    
+    // RSI signals
+    if (rsi > 70) {
+        signals.push({
+            type: 'warning',
+            icon: 'fas fa-exclamation-triangle',
+            text: 'RSI indicates overbought conditions',
+            action: 'Consider taking profits'
+        });
+    } else if (rsi < 30) {
+        signals.push({
+            type: 'success',
+            icon: 'fas fa-arrow-up',
+            text: 'RSI indicates oversold conditions',
+            action: 'Potential buying opportunity'
+        });
+    }
+    
+    // MACD signals
+    if (macd > 0) {
+        signals.push({
+            type: 'success',
+            icon: 'fas fa-bull',
+            text: 'MACD is bullish',
+            action: 'Positive momentum'
+        });
+    } else {
+        signals.push({
+            type: 'danger',
+            icon: 'fas fa-bear',
+            text: 'MACD is bearish',
+            action: 'Negative momentum'
+        });
+    }
+    
+    // Sentiment signals
+    if (sentiment > 0.1) {
+        signals.push({
+            type: 'success',
+            icon: 'fas fa-smile',
+            text: 'Positive market sentiment',
+            action: 'Favorable conditions'
+        });
+    } else if (sentiment < -0.1) {
+        signals.push({
+            type: 'danger',
+            icon: 'fas fa-frown',
+            text: 'Negative market sentiment',
+            action: 'Caution advised'
+        });
+    }
+    
+    return signals;
+}
+
+function displayTradingSignals() {
+    const signals = generateTradingSignals();
+    const container = document.getElementById('technical-signals');
+    
+    if (signals.length === 0) {
+        container.innerHTML = '<p class="text-muted">No clear signals at this time</p>';
+        return;
+    }
+    
+    let html = '';
+    signals.forEach(signal => {
+        html += `
+            <div class="alert alert-${signal.type} d-flex align-items-center mb-2">
+                <i class="${signal.icon} me-2"></i>
+                <div>
+                    <strong>${signal.text}</strong><br>
+                    <small>${signal.action}</small>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Load chart if available
+{% if chart %}
+document.addEventListener('DOMContentLoaded', function() {
+    const chartData = {{ chart|safe }};
+    if (chartData && chartData.data) {
+        Plotly.newPlot('chart-container', chartData.data, chartData.layout, {responsive: true});
+    }
+});
+{% endif %}
+
+// Initialize signals
+document.addEventListener('DOMContentLoaded', function() {
+    displayTradingSignals();
+    
+    // Update sentiment circle color
+    const sentimentScore = {{ sentiment_score if sentiment_score else 0 }};
+    const sentimentCircle = document.getElementById('sentiment-circle');
+    const sentimentProgress = document.getElementById('sentiment-progress');
+    
+    if (sentimentScore > 0.1) {
+        sentimentCircle.style.borderColor = '#28a745';
+        sentimentProgress.className = 'progress-bar bg-success';
+    } else if (sentimentScore < -0.1) {
+        sentimentCircle.style.borderColor = '#dc3545';
+        sentimentProgress.className = 'progress-bar bg-danger';
+    } else {
+        sentimentCircle.style.borderColor = '#6c757d';
+        sentimentProgress.className = 'progress-bar bg-secondary';
+    }
+});
+</script>
+
+<style>
+.sentiment-circle {
+    width: 100px;
+    height: 100px;
+    border: 4px solid #6c757d;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s ease;
+}
+
+.sentiment-score {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.sentiment-label {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+</style>
+{% endblock %}

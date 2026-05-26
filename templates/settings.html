@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+<div class="main-content" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-cog me-2"></i>Settings
+            </h1>
+            <p class="text-muted mb-0">Customize your experience and preferences</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Form -->
+<div class="main-content" data-aos="fade-up" data-aos-delay="100">
+    <form method="POST">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Theme & appearance (saved to your account) -->
+                <div class="card mb-4 border-primary border-2" data-aos="zoom-in" data-aos-delay="50">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-palette me-2"></i>Theme &amp; appearance</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">Choose how StockPredict Pro looks on this device. Your choice is saved to your account and synced when you log in.</p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button type="button" class="btn btn-outline-warning theme-option" data-theme-choice="light" onclick="setTheme('light')"><i class="fas fa-sun me-1"></i> Light</button>
+                            <button type="button" class="btn btn-outline-info theme-option" data-theme-choice="dark" onclick="setTheme('dark')"><i class="fas fa-moon me-1"></i> Dark</button>
+                            <button type="button" class="btn btn-outline-secondary theme-option" data-theme-choice="system" onclick="setTheme('system')"><i class="fas fa-desktop me-1"></i> Match system</button>
+                        </div>
+                        <div class="alert alert-info mb-0 py-2 small">
+                            <i class="fas fa-info-circle me-1"></i> Tip: You can also change theme anytime from the <strong>Theme</strong> menu in the top navigation bar.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- General Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-sliders-h me-2"></i>General Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="theme" class="form-label">Theme (saved)</label>
+                                <select class="form-select" id="theme" name="theme">
+                                    <option value="light" {% if preferences.theme == 'light' %}selected{% endif %}>Light</option>
+                                    <option value="dark" {% if preferences.theme == 'dark' %}selected{% endif %}>Dark</option>
+                                    <option value="system" {% if preferences.theme == 'system' %}selected{% endif %}>Match system</option>
+                                </select>
+                                <div class="form-text">Stored in your profile — same as the Theme menu in the navbar.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="default_prediction_days" class="form-label">Default Prediction Days</label>
+                                <select class="form-select" id="default_prediction_days" name="default_prediction_days">
+                                    <option value="7" {% if preferences.default_prediction_days == 7 %}selected{% endif %}>7 days</option>
+                                    <option value="14" {% if preferences.default_prediction_days == 14 %}selected{% endif %}>14 days</option>
+                                    <option value="30" {% if preferences.default_prediction_days == 30 %}selected{% endif %}>30 days</option>
+                                    <option value="60" {% if preferences.default_prediction_days == 60 %}selected{% endif %}>60 days</option>
+                                    <option value="90" {% if preferences.default_prediction_days == 90 %}selected{% endif %}>90 days</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Notifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="auto_refresh" name="auto_refresh" {% if preferences.auto_refresh %}checked{% endif %}>
+                                    <label class="form-check-label" for="auto_refresh">
+                                        Auto-refresh data
+                                    </label>
+                                    <div class="form-text">Automatically refresh market data every 30 seconds</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="email_notifications" name="email_notifications" {% if preferences.email_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_notifications">
+                                        Email notifications
+                                    </label>
+                                    <div class="form-text">Receive email alerts for important updates</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="watchlist_alerts" name="watchlist_alerts" {% if preferences.watchlist_alerts %}checked{% endif %}>
+                                    <label class="form-check-label" for="watchlist_alerts">
+                                        Watchlist alerts
+                                    </label>
+                                    <div class="form-text">Get notified when watchlist stocks move significantly</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="prediction_alerts" name="prediction_alerts" {% if preferences.prediction_alerts %}checked{% endif %}>
+                                    <label class="form-check-label" for="prediction_alerts">
+                                        Prediction alerts
+                                    </label>
+                                    <div class="form-text">Get notified when your predictions are close to target dates</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trading Preferences -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Trading Preferences</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="risk_tolerance" class="form-label">Risk Tolerance</label>
+                                <select class="form-select" id="risk_tolerance" name="risk_tolerance">
+                                    <option value="conservative" {% if preferences.risk_tolerance == 'conservative' %}selected{% endif %}>Conservative</option>
+                                    <option value="moderate" {% if preferences.risk_tolerance == 'moderate' %}selected{% endif %}>Moderate</option>
+                                    <option value="aggressive" {% if preferences.risk_tolerance == 'aggressive' %}selected{% endif %}>Aggressive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="investment_style" class="form-label">Investment Style</label>
+                                <select class="form-select" id="investment_style" name="investment_style">
+                                    <option value="value" {% if preferences.investment_style == 'value' %}selected{% endif %}>Value Investing</option>
+                                    <option value="growth" {% if preferences.investment_style == 'growth' %}selected{% endif %}>Growth Investing</option>
+                                    <option value="momentum" {% if preferences.investment_style == 'momentum' %}selected{% endif %}>Momentum Trading</option>
+                                    <option value="mixed" {% if preferences.investment_style == 'mixed' %}selected{% endif %}>Mixed Approach</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Preferences -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-database me-2"></i>Data Preferences</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="chart_type" class="form-label">Default Chart Type</label>
+                                <select class="form-select" id="chart_type" name="chart_type">
+                                    <option value="candlestick" {% if preferences.chart_type == 'candlestick' %}selected{% endif %}>Candlestick</option>
+                                    <option value="line" {% if preferences.chart_type == 'line' %}selected{% endif %}>Line Chart</option>
+                                    <option value="bar" {% if preferences.chart_type == 'bar' %}selected{% endif %}>Bar Chart</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="timeframe" class="form-label">Default Timeframe</label>
+                                <select class="form-select" id="timeframe" name="timeframe">
+                                    <option value="1d" {% if preferences.timeframe == '1d' %}selected{% endif %}>1 Day</option>
+                                    <option value="5d" {% if preferences.timeframe == '5d' %}selected{% endif %}>5 Days</option>
+                                    <option value="1mo" {% if preferences.timeframe == '1mo' %}selected{% endif %}>1 Month</option>
+                                    <option value="3mo" {% if preferences.timeframe == '3mo' %}selected{% endif %}>3 Months</option>
+                                    <option value="6mo" {% if preferences.timeframe == '6mo' %}selected{% endif %}>6 Months</option>
+                                    <option value="1y" {% if preferences.timeframe == '1y' %}selected{% endif %}>1 Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Settings
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Account Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-user me-2"></i>Account Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fa-2x"></i>
+                            </div>
+                            <h5>{{ current_user.username }}</h5>
+                            <p class="text-muted">{{ current_user.email }}</p>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary btn-sm" onclick="changePassword()">
+                                <i class="fas fa-key me-2"></i>Change Password
+                            </button>
+                            <button class="btn btn-outline-info btn-sm" onclick="exportData()">
+                                <i class="fas fa-download me-2"></i>Export Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Your Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Total Predictions</h6>
+                                <h4 class="text-primary">{{ current_user.predictions|length }}</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Watchlist Items</h6>
+                                <h4 class="text-success">{{ current_user.watchlists|length }}</h4>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Member Since</h6>
+                                <h6 class="text-info">{% if current_user.created_at %}{{ current_user.created_at.strftime('%Y-%m-%d') }}{% else %}—{% endif %}</h6>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h6 class="text-muted">Account Type</h6>
+                                <h6 class="text-warning">Free</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Tips -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Quick Tips</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Auto-refresh</h6>
+                            <p class="mb-0 small">Enable auto-refresh to get real-time market data updates automatically.</p>
+                        </div>
+                        <div class="alert alert-success">
+                            <h6><i class="fas fa-check-circle me-2"></i>Watchlist Alerts</h6>
+                            <p class="mb-0 small">Set up watchlist alerts to stay informed about significant price movements.</p>
+                        </div>
+                        <div class="alert alert-warning">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Risk Management</h6>
+                            <p class="mb-0 small">Choose your risk tolerance carefully to match your investment goals.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="changePasswordForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirm_password" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function changePassword() {
+    const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+    modal.show();
+}
+
+function exportData() {
+    window.location.href = '/api/predictions/export';
+}
+
+// Handle change password form
+var form = document.getElementById('changePasswordForm');
+if (form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var currentPassword = document.getElementById('current_password').value;
+        var newPassword = document.getElementById('new_password').value;
+        var confirmPassword = document.getElementById('confirm_password').value;
+
+        if (newPassword !== confirmPassword) {
+            alert('New passwords do not match!');
+            return;
+        }
+        if (newPassword.length < 6) {
+            alert('New password must be at least 6 characters long!');
+            return;
+        }
+
+        fetch('/api/user/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ current: currentPassword, new: newPassword })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                alert('Password changed successfully!');
+                form.reset();
+                var modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                if (modal) modal.hide();
+            } else {
+                alert(data.error || 'Failed to change password.');
+            }
+        })
+        .catch(function() { alert('Error changing password.'); });
+    });
+}
+
+// Theme sync with select
+var themeSelect = document.getElementById('theme');
+if (themeSelect) {
+    themeSelect.addEventListener('change', function() {
+        if (typeof setTheme === 'function') setTheme(this.value);
+    });
+}
+
+// Auto-save settings (optional)
+let autoSaveTimeout;
+function autoSave() {
+    clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = setTimeout(() => {
+        // Implementation for auto-save
+        console.log('Auto-saving settings...');
+    }, 2000);
+}
+
+// Add auto-save listeners
+document.querySelectorAll('select, input[type="checkbox"]').forEach(element => {
+    element.addEventListener('change', autoSave);
+});
+</script>
+{% endblock %}

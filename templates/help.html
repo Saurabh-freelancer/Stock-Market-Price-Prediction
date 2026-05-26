@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}Help & Support{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">
+                <i class="fas fa-question-circle me-3"></i>Help & Support
+            </h1>
+            <p class="lead text-muted">Find answers to common questions and get the help you need</p>
+        </div>
+    </div>
+
+    <!-- Quick Help Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 border-0 shadow-lg text-center">
+                <div class="card-body">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-rocket text-white" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title">Getting Started</h5>
+                    <p class="card-text text-muted">Learn how to use our platform effectively</p>
+                    <a href="#getting-started" class="btn btn-primary">View Guide</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 border-0 shadow-lg text-center">
+                <div class="card-body">
+                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-chart-line text-white" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title">Predictions</h5>
+                    <p class="card-text text-muted">Understand how our AI predictions work</p>
+                    <a href="#predictions" class="btn btn-success">Learn More</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 border-0 shadow-lg text-center">
+                <div class="card-body">
+                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-bug text-white" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title">Troubleshooting</h5>
+                    <p class="card-text text-muted">Fix common issues and problems</p>
+                    <a href="#troubleshooting" class="btn btn-info">Get Help</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card h-100 border-0 shadow-lg text-center">
+                <div class="card-body">
+                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-headset text-white" style="font-size: 2rem;"></i>
+                    </div>
+                    <h5 class="card-title">Contact Support</h5>
+                    <p class="card-text text-muted">Get personalized help from our team</p>
+                    <a href="{{ url_for('contact') }}" class="btn btn-warning">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="helpAccordion">
+                        <!-- Getting Started -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                    <i class="fas fa-rocket me-2"></i>How do I get started with the platform?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    <ol>
+                                        <li>Create an account by clicking the "Register" button</li>
+                                        <li>Verify your email address</li>
+                                        <li>Log in and explore the dashboard</li>
+                                        <li>Start making predictions by entering a stock symbol</li>
+                                        <li>Add stocks to your watchlist for tracking</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                    <i class="fas fa-chart-line me-2"></i>How accurate are the stock predictions?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    Our AI models use advanced machine learning algorithms and real-time market data to provide predictions. 
+                                    While we strive for accuracy, stock markets are inherently unpredictable. Our predictions should be used as 
+                                    guidance and not as financial advice. Always do your own research before making investment decisions.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                    <i class="fas fa-dollar-sign me-2"></i>Is the platform free to use?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    Yes, our basic features are free to use including:
+                                    <ul>
+                                        <li>Stock price predictions</li>
+                                        <li>Basic technical analysis</li>
+                                        <li>Market overview</li>
+                                        <li>Watchlist management</li>
+                                    </ul>
+                                    Premium features may be available for advanced users who need more detailed analysis.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                    <i class="fas fa-clock me-2"></i>How often is the market data updated?
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    Market data is updated in real-time during market hours. We use reliable data sources to ensure 
+                                    the most current information is available to our users. After market hours, data reflects the 
+                                    most recent trading session.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+                                    <i class="fas fa-bell me-2"></i>How do price alerts work?
+                                </button>
+                            </h2>
+                            <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    Price alerts notify you when a stock reaches your target price:
+                                    <ol>
+                                        <li>Go to the Alerts section</li>
+                                        <li>Click "Create Alert"</li>
+                                        <li>Enter the stock symbol and target price</li>
+                                        <li>Choose alert type (above/below/change)</li>
+                                        <li>Set notification preferences</li>
+                                    </ol>
+                                    You'll receive notifications when your conditions are met.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading6">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6">
+                                    <i class="fas fa-briefcase me-2"></i>How do I track my portfolio?
+                                </button>
+                            </h2>
+                            <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    Portfolio tracking helps you monitor your investments:
+                                    <ul>
+                                        <li>Make predictions to add stocks to your portfolio</li>
+                                        <li>View performance metrics and accuracy</li>
+                                        <li>Track gains/losses over time</li>
+                                        <li>Analyze prediction accuracy</li>
+                                        <li>Export portfolio data</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Guides -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-book me-2"></i>Feature Guides</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-crystal-ball me-2 text-primary"></i>Making Predictions
+                                    </h5>
+                                    <p class="card-text">Learn how to use our AI-powered prediction system effectively.</p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Enter stock symbols correctly</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Choose prediction timeframe</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Understand prediction results</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Save predictions to portfolio</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-chart-bar me-2 text-info"></i>Technical Analysis
+                                    </h5>
+                                    <p class="card-text">Understand technical indicators and market analysis tools.</p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>RSI (Relative Strength Index)</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Moving averages</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Bollinger Bands</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Volume analysis</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-eye me-2 text-warning"></i>Watchlist Management
+                                    </h5>
+                                    <p class="card-text">Organize and track your favorite stocks efficiently.</p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Add stocks to watchlist</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Set custom notes</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Monitor price changes</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Remove unwanted stocks</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-newspaper me-2 text-danger"></i>Market News
+                                    </h5>
+                                    <p class="card-text">Stay informed with the latest market news and sentiment.</p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Real-time news updates</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Sentiment analysis</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Category filtering</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Trending topics</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Options -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-headset me-2"></i>Get Help</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-envelope text-white" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5>Email Support</h5>
+                                <p class="text-muted">Get help via email within 24 hours</p>
+                                <a href="mailto:saurabhsingh.freelancer.09@gmail.com" class="btn btn-primary">Send Email</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-comment-dots text-white" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5>Feedback</h5>
+                                <p class="text-muted">Share your feedback and suggestions</p>
+                                <a href="{{ url_for('feedback') }}" class="btn btn-success">Give Feedback</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <div class="bg-info rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-phone text-white" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5>Contact Form</h5>
+                                <p class="text-muted">Use our contact form for detailed inquiries</p>
+                                <a href="{{ url_for('contact') }}" class="btn btn-info">Contact Us</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

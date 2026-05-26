@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}Watchlist - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+<div class="main-content" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-eye me-2"></i>My Watchlist
+            </h1>
+            <p class="text-muted mb-0">Track your favorite stocks and get real-time updates</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockModal">
+                <i class="fas fa-plus me-2"></i>Add Stock
+            </button>
+            <button class="btn btn-outline-primary" onclick="refreshWatchlist()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Stock Modal -->
+<div class="modal fade" id="addStockModal" tabindex="-1" aria-labelledby="addStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addStockModalLabel">Add Stock to Watchlist</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="symbol" class="form-label">Stock Symbol</label>
+                        <input type="text" class="form-control" id="symbol" name="symbol" placeholder="e.g., AAPL, GOOGL, MSFT" required>
+                        <div class="form-text">Enter the stock symbol you want to watch</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any notes about this stock..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add to Watchlist</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Watchlist Items -->
+{% if watchlist_items %}
+<div class="main-content" data-aos="fade-up" data-aos-delay="100">
+    <div class="row">
+        {% for item in watchlist_items %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 watchlist-card" data-symbol="{{ item.symbol }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="mb-1 text-primary">{{ item.symbol }}</h5>
+                            <p class="mb-0 small text-muted" id="company-name-{{ item.symbol }}">Loading...</p>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/stock_analysis/{{ item.symbol }}"><i class="fas fa-chart-bar me-2"></i>Analyze</a></li>
+                                <li><a class="dropdown-item" href="/predict?symbol={{ item.symbol }}"><i class="fas fa-crystal-ball me-2"></i>Predict</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="/remove_from_watchlist/{{ item.id }}" onclick="return confirm('Remove {{ item.symbol }} from watchlist?')"><i class="fas fa-trash me-2"></i>Remove</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h4 class="mb-1" id="price-{{ item.symbol }}">Loading...</h4>
+                        <div class="d-flex align-items-center">
+                            <span class="badge" id="change-badge-{{ item.symbol }}">Loading...</span>
+                            <span class="ms-2 small" id="change-text-{{ item.symbol }}">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    {% if item.notes %}
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-sticky-note me-1"></i>{{ item.notes }}
+                        </small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm flex-fill" onclick="viewStockAnalysis('{{ item.symbol }}')">
+                            <i class="fas fa-chart-bar me-1"></i>Analyze
+                        </button>
+                        <button class="btn btn-outline-success btn-sm flex-fill" onclick="predictStock('{{ item.symbol }}')">
+                            <i class="fas fa-crystal-ball me-1"></i>Predict
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="getSentiment('{{ item.symbol }}')" title="Sentiment">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>Added {{ item.added_date.strftime('%Y-%m-%d') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Watchlist Summary -->
+<div class="main-content" data-aos="fade-up" data-aos-delay="200">
+    <h3 class="mb-4">
+        <i class="fas fa-chart-pie me-2"></i>Watchlist Summary
+    </h3>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-eye text-primary fa-2x mb-3"></i>
+                    <h5 class="text-primary">Total Stocks</h5>
+                    <p class="mb-0">{{ watchlist_items|length }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-arrow-up text-success fa-2x mb-3"></i>
+                    <h5 class="text-success">Gaining</h5>
+                    <p class="mb-0" id="gaining-count">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-arrow-down text-danger fa-2x mb-3"></i>
+                    <h5 class="text-danger">Declining</h5>
+                    <p class="mb-0" id="declining-count">-</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-percentage text-info fa-2x mb-3"></i>
+                    <h5 class="text-info">Avg Change</h5>
+                    <p class="mb-0" id="avg-change">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Empty Watchlist -->
+<div class="main-content text-center py-5" data-aos="fade-up">
+    <i class="fas fa-eye text-muted" style="font-size: 4rem;"></i>
+    <h4 class="mt-3 text-muted">Your watchlist is empty</h4>
+    <p class="text-muted">Add stocks to your watchlist to track their performance</p>
+    <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#addStockModal">
+        <i class="fas fa-plus me-2"></i>Add Your First Stock
+    </button>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="main-content mt-4" data-aos="fade-up" data-aos-delay="300">
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('market_overview') }}" class="btn btn-outline-primary">
+            <i class="fas fa-globe me-2"></i>Market Overview
+        </a>
+        <a href="{{ url_for('predict') }}" class="btn btn-outline-success">
+            <i class="fas fa-crystal-ball me-2"></i>Make Prediction
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-info">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let watchlistData = {};
+
+function refreshWatchlist() {
+    const symbols = Array.from(document.querySelectorAll('.watchlist-card')).map(card => card.dataset.symbol);
+    
+    symbols.forEach(symbol => {
+        fetch(`/api/stock/${symbol}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(`Error fetching data for ${symbol}:`, data.error);
+                    return;
+                }
+                
+                updateStockCard(symbol, data);
+                watchlistData[symbol] = data;
+            })
+            .catch(error => {
+                console.error(`Error fetching data for ${symbol}:`, error);
+            });
+    });
+    
+    updateSummary();
+}
+
+function updateStockCard(symbol, data) {
+    // Update company name
+    const nameElement = document.getElementById(`company-name-${symbol}`);
+    if (nameElement) {
+        nameElement.textContent = data.name || symbol;
+    }
+    
+    // Update price
+    const priceElement = document.getElementById(`price-${symbol}`);
+    if (priceElement) {
+        priceElement.textContent = `$${data.current_price.toFixed(2)}`;
+    }
+    
+    // Update change
+    const changeBadge = document.getElementById(`change-badge-${symbol}`);
+    const changeText = document.getElementById(`change-text-${symbol}`);
+    
+    if (changeBadge && changeText) {
+        const change = data.current_price - data.previous_close;
+        const changePercent = (change / data.previous_close) * 100;
+        
+        if (change >= 0) {
+            changeBadge.className = 'badge bg-success';
+            changeBadge.textContent = `+${changePercent.toFixed(2)}%`;
+            changeText.textContent = `+$${change.toFixed(2)}`;
+            changeText.className = 'ms-2 small text-success';
+        } else {
+            changeBadge.className = 'badge bg-danger';
+            changeBadge.textContent = `${changePercent.toFixed(2)}%`;
+            changeText.textContent = `$${change.toFixed(2)}`;
+            changeText.className = 'ms-2 small text-danger';
+        }
+    }
+}
+
+function updateSummary() {
+    const data = Object.values(watchlistData);
+    if (data.length === 0) return;
+    
+    const gaining = data.filter(stock => {
+        const change = stock.current_price - stock.previous_close;
+        return change > 0;
+    }).length;
+    
+    const declining = data.length - gaining;
+    const avgChange = data.reduce((sum, stock) => {
+        const change = stock.current_price - stock.previous_close;
+        const changePercent = (change / stock.previous_close) * 100;
+        return sum + changePercent;
+    }, 0) / data.length;
+    
+    document.getElementById('gaining-count').textContent = gaining;
+    document.getElementById('declining-count').textContent = declining;
+    document.getElementById('avg-change').textContent = `${avgChange.toFixed(2)}%`;
+}
+
+function viewStockAnalysis(symbol) {
+    window.location.href = `/stock_analysis/${symbol}`;
+}
+
+function predictStock(symbol) {
+    window.location.href = `/predict?symbol=${symbol}`;
+}
+
+function getSentiment(symbol) {
+    fetch(`/api/sentiment/${symbol}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error fetching sentiment data');
+                return;
+            }
+            
+            const sentiment = data.sentiment_label;
+            const score = data.sentiment_score;
+            alert(`${symbol} Sentiment: ${sentiment} (Score: ${score.toFixed(3)})`);
+        })
+        .catch(error => {
+            console.error('Error fetching sentiment:', error);
+            alert('Error fetching sentiment data');
+        });
+}
+
+// Auto-refresh watchlist every 30 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    refreshWatchlist();
+    setInterval(refreshWatchlist, 30000);
+});
+</script>
+{% endblock %}

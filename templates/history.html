@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+<div class="main-content" data-aos="fade-up">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-history me-2"></i>Prediction History
+            </h1>
+            <p class="text-muted mb-0">All saved predictions for your account (stored in the database).</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+            </a>
+            <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New prediction
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="main-content" data-aos="fade-up" data-aos-delay="80">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <p class="mb-0 text-muted">
+            Showing <strong>{{ pagination.items|length }}</strong> of <strong>{{ pagination.total }}</strong> records
+            (page {{ pagination.page }} of {{ pagination.pages or 1 }})
+        </p>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="fas fa-print me-1"></i>Print
+        </button>
+    </div>
+
+    {% if pagination.items %}
+    <div class="table-responsive card p-0 overflow-hidden">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Symbol</th>
+                    <th>Current</th>
+                    <th>Predicted</th>
+                    <th>Target date</th>
+                    <th>Confidence</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pagination.items %}
+                <tr data-aos="fade-left" data-aos-delay="{{ (loop.index0 * 25) if (loop.index0 * 25) < 400 else 400 }}">
+                    <td>{{ (pagination.page - 1) * pagination.per_page + loop.index }}</td>
+                    <td><strong>{{ p.symbol }}</strong></td>
+                    <td>${{ "%.2f"|format(p.current_price) }}</td>
+                    <td>${{ "%.2f"|format(p.predicted_price) }}</td>
+                    <td>{{ p.target_date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <span class="badge bg-info text-dark">{{ "%.1f"|format(p.confidence * 100) }}%</span>
+                    </td>
+                    <td><small>{{ p.prediction_date.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                    <td>
+                        {% if p.target_date > today %}
+                            <span class="badge bg-warning text-dark">Active</span>
+                        {% else %}
+                            <span class="badge bg-success">Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <nav class="mt-4" aria-label="History pagination" data-aos="fade-up">
+        <ul class="pagination justify-content-center flex-wrap">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('prediction_history', page=pagination.prev_num) if pagination.has_prev else '#' }}">Previous</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">Page {{ pagination.page }} / {{ pagination.pages }}</span>
+            </li>
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                <a class="page-link" href="{{ url_for('prediction_history', page=pagination.next_num) if pagination.has_next else '#' }}">Next</a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5" data-aos="zoom-in">
+        <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+        <h4>No history yet</h4>
+        <p class="text-muted">Predictions you make are saved here automatically.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg mt-2">
+            <i class="fas fa-crystal-ball me-2"></i>Make a prediction
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

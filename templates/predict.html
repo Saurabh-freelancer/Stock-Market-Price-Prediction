@@ -1,0 +1,833 @@
+{% extends "base.html" %}
+
+{% block title %}Make Prediction - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+<div class="main-content" data-aos="fade-up">
+    <div class="text-center mb-4">
+        <i class="fas fa-crystal-ball" style="font-size: 3rem; color: #3498db;"></i>
+        <h2 class="mt-3">Stock Price Prediction</h2>
+        <p class="text-muted">Use AI to predict future stock prices</p>
+    </div>
+    
+    <!-- Prediction Form -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card" data-aos="fade-right">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-cog me-2"></i>Prediction Settings
+                    </h5>
+                    
+                    <form id="predictionForm">
+                        <div class="mb-3">
+                            <label for="symbol" class="form-label">
+                                <i class="fas fa-chart-line me-2"></i>Stock Symbol
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" id="symbol" name="symbol" 
+                                       placeholder="e.g., AAPL, GOOGL, MSFT" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="searchStock()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">Enter the stock symbol (e.g., AAPL for Apple Inc.)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="days_ahead" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>Prediction Timeframe
+                            </label>
+                            <select class="form-control" id="days_ahead" name="days_ahead" required>
+                                <option value="">Select timeframe</option>
+                                <option value="7">1 Week</option>
+                                <option value="14">2 Weeks</option>
+                                <option value="30">1 Month</option>
+                                <option value="60">2 Months</option>
+                                <option value="90">3 Months</option>
+                                <option value="180">6 Months</option>
+                                <option value="365">1 Year</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-sliders-h me-2"></i>Prediction Model
+                            </label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prediction_type" id="model1" value="simple" checked>
+                                <label class="form-check-label" for="model1">
+                                    Simple Linear Regression
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prediction_type" id="model2" value="enhanced">
+                                <label class="form-check-label" for="model2">
+                                    Enhanced AI Model (Recommended)
+                                </label>
+                                <div class="form-text">Uses technical indicators, sentiment analysis, and multiple ML models</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic me-2"></i>Generate Prediction
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                                <i class="fas fa-redo me-2"></i>Reset Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Popular Stocks -->
+            <div class="card mt-4" data-aos="fade-right" data-aos-delay="200">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-star me-2"></i>Popular Stocks
+                    </h5>
+                    <div class="row">
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="selectStock('AAPL')">
+                                <i class="fas fa-apple me-1"></i>AAPL
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="selectStock('GOOGL')">
+                                <i class="fab fa-google me-1"></i>GOOGL
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="selectStock('MSFT')">
+                                <i class="fab fa-microsoft me-1"></i>MSFT
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="selectStock('AMZN')">
+                                <i class="fab fa-amazon me-1"></i>AMZN
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="selectStock('TSLA')">
+                                <i class="fas fa-car me-1"></i>TSLA
+                            </button>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="selectStock('META')">
+                                <i class="fab fa-facebook me-1"></i>META
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card mt-4" data-aos="fade-right" data-aos-delay="300">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-tachometer-alt me-2"></i>View Dashboard
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-chart-bar me-2"></i>Market Overview
+                        </a>
+                        <button class="btn btn-outline-warning btn-sm" onclick="showPredictionHistory()">
+                            <i class="fas fa-history me-2"></i>Prediction History
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Loading State -->
+            <div id="loading" class="loading" data-aos="fade-left">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h5 class="mt-3">Analyzing Stock Data...</h5>
+                        <p class="text-muted">Our AI is processing historical data and market trends</p>
+                        <div class="progress mt-3">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 75%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prediction Results -->
+            <div id="results" style="display: none;" data-aos="fade-left">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-line me-2"></i>Prediction Results
+                        </h5>
+                        
+                        <div id="predictionContent">
+                            <!-- Results will be populated here -->
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" onclick="savePrediction()">
+                                    <i class="fas fa-save me-2"></i>Save Prediction
+                                </button>
+                                <button class="btn btn-outline-primary" onclick="sharePrediction()">
+                                    <i class="fas fa-share me-2"></i>Share Results
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="exportPrediction()">
+                                    <i class="fas fa-download me-2"></i>Export Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stock Chart -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-area me-2"></i>Price History
+                            </h5>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-primary btn-sm active" onclick="changeChartType('line')">Line</button>
+                                <button class="btn btn-outline-primary btn-sm" onclick="changeChartType('candlestick')">Candlestick</button>
+                                <button class="btn btn-outline-primary btn-sm" onclick="changeChartType('volume')">Volume</button>
+                            </div>
+                        </div>
+                        <canvas id="stockChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Technical Indicators -->
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Technical Indicators</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h6 class="text-primary">RSI</h6>
+                                        <h4 class="text-success">65.2</h4>
+                                        <small class="text-muted">Neutral</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h6 class="text-primary">MACD</h6>
+                                        <h4 class="text-success">+0.15</h4>
+                                        <small class="text-muted">Bullish</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h6 class="text-primary">Bollinger</h6>
+                                        <h4 class="text-warning">Upper</h4>
+                                        <small class="text-muted">Overbought</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="text-center p-3 border rounded">
+                                        <h6 class="text-primary">Volume</h6>
+                                        <h4 class="text-info">2.5M</h4>
+                                        <small class="text-muted">Above Avg</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Analysis Section -->
+            <div class="row mt-4">
+                <!-- Risk Assessment -->
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="700">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Risk Assessment</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6>Volatility Risk</h6>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                </div>
+                                <small class="text-muted">Medium Risk (65%)</small>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Market Risk</h6>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success" style="width: 35%"></div>
+                                </div>
+                                <small class="text-muted">Low Risk (35%)</small>
+                            </div>
+                            <div class="mb-3">
+                                <h6>Liquidity Risk</h6>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-info" style="width: 20%"></div>
+                                </div>
+                                <small class="text-muted">Very Low (20%)</small>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Overall Risk:</strong> Medium
+                                <br>
+                                <small>Suitable for moderate risk tolerance</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fundamental Analysis -->
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="800">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-balance-scale me-2"></i>Fundamental Metrics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <small class="text-muted d-block">P/E Ratio</small>
+                                        <strong class="text-primary">25.4</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <small class="text-muted d-block">PEG Ratio</small>
+                                        <strong class="text-success">1.2</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <small class="text-muted d-block">ROE</small>
+                                        <strong class="text-info">18.5%</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="border rounded p-2">
+                                        <small class="text-muted d-block">Debt/Equity</small>
+                                        <strong class="text-warning">0.8</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <h6>Analyst Consensus</h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Buy</span>
+                                    <span class="text-success">75%</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Hold</span>
+                                    <span class="text-warning">20%</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Sell</span>
+                                    <span class="text-danger">5%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Tools -->
+                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="900">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Peer Comparison</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Compare with:</label>
+                                <select class="form-select" id="comparisonStock">
+                                    <option value="">Select a stock...</option>
+                                    <option value="MSFT">MSFT - Microsoft</option>
+                                    <option value="GOOGL">GOOGL - Alphabet</option>
+                                    <option value="AMZN">AMZN - Amazon</option>
+                                    <option value="META">META - Meta Platforms</option>
+                                </select>
+                            </div>
+                            <div class="comparison-results" id="comparisonResults" style="display: none;">
+                                <h6>Performance Comparison</h6>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Your Stock</small>
+                                        <strong class="text-primary">+12.5%</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Peer Stock</small>
+                                        <strong class="text-info">+8.2%</strong>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-success">
+                                        <i class="fas fa-arrow-up me-1"></i>Outperforming by 4.3%
+                                    </small>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="compareStocks()">
+                                <i class="fas fa-chart-bar me-1"></i>Compare
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Sentiment & Social Analysis -->
+            <div class="row mt-4">
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="1000">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-heart me-2"></i>Market Sentiment</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center mb-3">
+                                <div class="col-4">
+                                    <div class="sentiment-item">
+                                        <i class="fas fa-thumbs-up text-success" style="font-size: 2rem;"></i>
+                                        <h5 class="text-success mt-2">68%</h5>
+                                        <small class="text-muted">Bullish</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="sentiment-item">
+                                        <i class="fas fa-minus text-warning" style="font-size: 2rem;"></i>
+                                        <h5 class="text-warning mt-2">22%</h5>
+                                        <small class="text-muted">Neutral</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="sentiment-item">
+                                        <i class="fas fa-thumbs-down text-danger" style="font-size: 2rem;"></i>
+                                        <h5 class="text-danger mt-2">10%</h5>
+                                        <small class="text-muted">Bearish</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sentiment-chart">
+                                <canvas id="sentimentChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6" data-aos="fade-up" data-aos-delay="1100">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-users me-2"></i>Social Media Analysis</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="social-metrics mb-3">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <div class="border rounded p-2">
+                                            <i class="fab fa-twitter text-info mb-1"></i>
+                                            <div><strong>1.2K</strong></div>
+                                            <small class="text-muted">Mentions</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-2">
+                                            <i class="fab fa-reddit text-warning mb-1"></i>
+                                            <div><strong>856</strong></div>
+                                            <small class="text-muted">Posts</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-2">
+                                            <i class="fas fa-chart-line text-success mb-1"></i>
+                                            <div><strong>+15%</strong></div>
+                                            <small class="text-muted">Trend</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="trending-topics">
+                                <h6>Trending Topics</h6>
+                                <div class="mb-2">
+                                    <span class="badge bg-primary me-1">#Earnings</span>
+                                    <span class="badge bg-success me-1">#Innovation</span>
+                                    <span class="badge bg-info me-1">#Technology</span>
+                                    <span class="badge bg-warning me-1">#Growth</span>
+                                </div>
+                                <small class="text-muted">Based on social media sentiment analysis</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error State -->
+            <div id="error" style="display: none;" data-aos="fade-left">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-danger">Prediction Failed</h5>
+                        <p id="errorMessage" class="text-muted">Unable to generate prediction</p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="resetForm()">
+                                <i class="fas fa-redo me-2"></i>Try Again
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="contactSupport()">
+                                <i class="fas fa-headset me-2"></i>Contact Support
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- How It Works -->
+    <div class="card mt-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="card-body">
+            <h5 class="card-title">
+                <i class="fas fa-info-circle me-2"></i>How Our AI Works
+            </h5>
+            <div class="row">
+                <div class="col-md-3 text-center mb-3">
+                    <i class="fas fa-database text-primary mb-2" style="font-size: 2rem;"></i>
+                    <h6>Data Collection</h6>
+                    <p class="small text-muted">Gathers historical price data, volume, and technical indicators</p>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <i class="fas fa-brain text-success mb-2" style="font-size: 2rem;"></i>
+                    <h6>AI Analysis</h6>
+                    <p class="small text-muted">Machine learning algorithms analyze patterns and trends</p>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <i class="fas fa-chart-line text-warning mb-2" style="font-size: 2rem;"></i>
+                    <h6>Pattern Recognition</h6>
+                    <p class="small text-muted">Identifies recurring patterns and market behavior</p>
+                </div>
+                <div class="col-md-3 text-center mb-3">
+                    <i class="fas fa-crystal-ball text-info mb-2" style="font-size: 2rem;"></i>
+                    <h6>Prediction</h6>
+                    <p class="small text-muted">Generates price predictions with confidence scores</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Disclaimer -->
+    <div class="alert alert-warning mt-4" data-aos="fade-up" data-aos-delay="500">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Disclaimer:</strong> This tool is for educational and research purposes only. Stock market predictions are inherently uncertain and should not be used as the sole basis for investment decisions. Always consult with financial advisors before making investment decisions.
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let stockChart = null;
+let currentChartType = 'line';
+
+function selectStock(symbol) {
+    document.getElementById('symbol').value = symbol;
+    // Auto-trigger search for better UX
+    searchStock();
+}
+
+function searchStock() {
+    const symbol = document.getElementById('symbol').value;
+    if (symbol) {
+        // Show loading state
+        document.getElementById('searchBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        // Simulate search delay
+        setTimeout(() => {
+            document.getElementById('searchBtn').innerHTML = '<i class="fas fa-search"></i>';
+            // You can implement actual stock search here
+            console.log('Searching for:', symbol);
+        }, 1000);
+    }
+}
+
+function resetForm() {
+    document.getElementById('predictionForm').reset();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+}
+
+document.getElementById('predictionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const symbol = document.getElementById('symbol').value.toUpperCase();
+    const daysAhead = document.getElementById('days_ahead').value;
+    const predictionType = document.querySelector('input[name="prediction_type"]:checked').value;
+    
+    if (!symbol || !daysAhead) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+    
+    // Get stock info first
+    fetch(`/api/stock/${symbol}`)
+        .then(response => response.json())
+        .then(stockData => {
+            if (stockData.error) {
+                throw new Error(stockData.error);
+            }
+            
+            // Make prediction
+            const formData = new FormData();
+            formData.append('symbol', symbol);
+            formData.append('days_ahead', daysAhead);
+            formData.append('prediction_type', predictionType);
+            
+            return fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (data.success) {
+                displayResults(data, symbol);
+            } else {
+                throw new Error(data.error || 'Prediction failed');
+            }
+        })
+        .catch(error => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('errorMessage').textContent = error.message;
+        });
+});
+
+function displayResults(data, symbol) {
+    const resultsDiv = document.getElementById('results');
+    const contentDiv = document.getElementById('predictionContent');
+    
+    const priceChange = data.predicted_price - data.current_price;
+    const priceChangePercent = (priceChange / data.current_price) * 100;
+    const isPositive = priceChange >= 0;
+    
+    contentDiv.innerHTML = `
+        <div class="row">
+            <div class="col-6">
+                <div class="text-center">
+                    <h6 class="text-muted">Current Price</h6>
+                    <h3 class="text-primary">$${data.current_price}</h3>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="text-center">
+                    <h6 class="text-muted">Predicted Price</h6>
+                    <h3 class="${isPositive ? 'text-success' : 'text-danger'}">$${data.predicted_price}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-6">
+                <div class="text-center">
+                    <h6 class="text-muted">Price Change</h6>
+                    <h4 class="${isPositive ? 'text-success' : 'text-danger'}">
+                        ${isPositive ? '+' : ''}$${priceChange.toFixed(2)}
+                    </h4>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="text-center">
+                    <h6 class="text-muted">Change %</h6>
+                    <h4 class="${isPositive ? 'text-success' : 'text-danger'}">
+                        ${isPositive ? '+' : ''}${priceChangePercent.toFixed(2)}%
+                    </h4>
+                </div>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row">
+            <div class="col-6">
+                <div class="text-center">
+                    <h6 class="text-muted">Target Date</h6>
+                    <h5>${data.target_date}</h5>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="text-center">
+                    <h6 class="text-muted">Confidence</h6>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: ${data.confidence}%;"
+                             aria-valuenow="${data.confidence}" aria-valuemin="0" aria-valuemax="100">
+                            ${data.confidence}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <div class="alert ${isPositive ? 'alert-success' : 'alert-danger'}" role="alert">
+                <i class="fas ${isPositive ? 'fa-arrow-up' : 'fa-arrow-down'} me-2"></i>
+                <strong>₹{symbol}</strong> is predicted to ₹{isPositive ? 'increase' : 'decrease'} by ₹{Math.abs(priceChangePercent).toFixed(2)}% 
+                over the next ₹{document.getElementById('days_ahead').value} days.
+            </div>
+        </div>
+    `;
+    
+    resultsDiv.style.display = 'block';
+    
+    // Create stock chart
+    createStockChart(symbol);
+}
+
+function createStockChart(symbol) {
+    fetch(`/api/stock/₹{symbol}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.history && data.history.length > 0) {
+                const ctx = document.getElementById('stockChart').getContext('2d');
+                
+                if (stockChart) {
+                    stockChart.destroy();
+                }
+                
+                const labels = Array.from({length: data.history.length}, (_, i) => `Day ${i + 1}`);
+                
+                stockChart = new Chart(ctx, {
+                    type: currentChartType === 'line' ? 'line' : 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `₹{symbol} Price History`,
+                            data: data.history,
+                            borderColor: '#3498db',
+                            backgroundColor: currentChartType === 'line' ? 'rgba(52, 152, 219, 0.1)' : 'rgba(52, 152, 219, 0.8)',
+                            tension: 0.4,
+                            fill: currentChartType === 'line',
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching stock chart data:', error);
+        });
+}
+
+function changeChartType(type) {
+    currentChartType = type;
+    if (stockChart) {
+        createStockChart(document.getElementById('symbol').value);
+    }
+    
+    // Update button states
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+}
+
+function savePrediction() {
+    alert('Prediction saved to your dashboard!');
+}
+
+function sharePrediction() {
+    alert('Share functionality will be implemented here');
+}
+
+function exportPrediction() {
+    alert('Export functionality will be implemented here');
+}
+
+function showPredictionHistory() {
+    window.location.href = '/dashboard';
+}
+
+function contactSupport() {
+    // Implementation for contacting support
+    alert('Contact support functionality will be implemented here');
+}
+
+// New functions for additional features
+function compareStocks() {
+    const comparisonStock = document.getElementById('comparisonStock').value;
+    const resultsDiv = document.getElementById('comparisonResults');
+    
+    if (comparisonStock) {
+        resultsDiv.style.display = 'block';
+        // Simulate comparison data
+        console.log('Comparing with:', comparisonStock);
+    } else {
+        alert('Please select a stock to compare');
+    }
+}
+
+function createSentimentChart() {
+    const ctx = document.getElementById('sentimentChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Bullish', 'Neutral', 'Bearish'],
+                datasets: [{
+                    data: [68, 22, 10],
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Initialize sentiment chart when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    createSentimentChart();
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %} 

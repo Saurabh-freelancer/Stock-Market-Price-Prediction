@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}Market Overview - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+<div class="main-content" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-globe me-2"></i>Market Overview
+            </h1>
+            <p class="text-muted mb-0">Real-time market data, sector performance, and market insights</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" onclick="refreshMarketData()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+            <button class="btn btn-primary" onclick="toggleAutoRefresh()">
+                <i class="fas fa-play me-2"></i>Auto-Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Market Indices -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="100">
+    <h3 class="mb-4">
+        <i class="fas fa-chart-line me-2"></i>Market Indices
+    </h3>
+    <div class="row">
+        {% for index in market_overview.indices %}
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="mb-1 text-primary">{{ index.symbol }}</h5>
+                            <p class="mb-0 small text-muted">{{ index.name }}</p>
+                        </div>
+                        <div class="text-end">
+                            {% if index.change_percent >= 0 %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-arrow-up me-1"></i>+{{ "%.2f"|format(index.change_percent) }}%
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-arrow-down me-1"></i>{{ "%.2f"|format(index.change_percent) }}%
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <h4 class="mb-3 text-dark">${{ "%.2f"|format(index.price) }}</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Change</span>
+                        <span class="{% if index.change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if index.change >= 0 %}+{% endif %}{{ "%.2f"|format(index.change) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Sector Performance -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="200">
+    <h3 class="mb-4">
+        <i class="fas fa-layer-group me-2"></i>Sector Performance
+    </h3>
+    <div class="row">
+        {% for sector in sector_performance %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="mb-1 text-primary">{{ sector.sector }}</h6>
+                            <p class="mb-0 small text-muted">{{ sector.etf }}</p>
+                        </div>
+                        <div class="text-end">
+                            {% if sector.change_percent >= 0 %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-arrow-up me-1"></i>+{{ "%.2f"|format(sector.change_percent) }}%
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-arrow-down me-1"></i>{{ "%.2f"|format(sector.change_percent) }}%
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <h5 class="mb-3 text-dark">${{ "%.2f"|format(sector.price) }}</h5>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar {% if sector.change_percent >= 0 %}bg-success{% else %}bg-danger{% endif %}" 
+                             style="width: {{ sector.change_percent|abs }}%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Change</span>
+                        <span class="{% if sector.change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if sector.change >= 0 %}+{% endif %}{{ "%.2f"|format(sector.change) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Top Stocks -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="300">
+    <h3 class="mb-4">
+        <i class="fas fa-star me-2"></i>Top Performing Stocks
+    </h3>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Company</th>
+                    <th>Price</th>
+                    <th>Change</th>
+                    <th>Change %</th>
+                    <th>Volume</th>
+                    <th>Sector</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in market_overview.stocks %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <strong>{{ stock.symbol[:2] }}</strong>
+                            </div>
+                            <strong>{{ stock.symbol }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <strong>{{ stock.name }}</strong>
+                            <br>
+                            <small class="text-muted">Market Cap: ${{ "{:.1f}B".format(stock.market_cap / 1000000000) if stock.market_cap else 'N/A' }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="fw-bold">${{ "%.2f"|format(stock.price) }}</span>
+                    </td>
+                    <td>
+                        <span class="{% if stock.change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if stock.change >= 0 %}+{% endif %}{{ "%.2f"|format(stock.change) }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if stock.change_percent >= 0 %}
+                            <span class="badge bg-success">+{{ "%.2f"|format(stock.change_percent) }}%</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ "%.2f"|format(stock.change_percent) }}%</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="small">{{ "{:.1f}M".format(stock.volume / 1000000) if stock.volume else 'N/A' }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ stock.sector }}</span>
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewStockAnalysis('{{ stock.symbol }}')" title="Analyze">
+                                <i class="fas fa-chart-bar"></i>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="addToWatchlist('{{ stock.symbol }}')" title="Add to Watchlist">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-info btn-sm" onclick="predictStock('{{ stock.symbol }}')" title="Predict">
+                                <i class="fas fa-crystal-ball"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Market News -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="400">
+    <h3 class="mb-4">
+        <i class="fas fa-newspaper me-2"></i>Market News & Sentiment
+    </h3>
+    <div class="row">
+        {% for news in market_news %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge 
+                            {% if news.impact == 'High' %}bg-danger
+                            {% elif news.impact == 'Medium' %}bg-warning
+                            {% else %}bg-info{% endif %}">
+                            {{ news.impact }} Impact
+                        </span>
+                        <span class="badge 
+                            {% if news.sentiment > 0.1 %}bg-success
+                            {% elif news.sentiment < -0.1 %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {% if news.sentiment > 0.1 %}Positive
+                            {% elif news.sentiment < -0.1 %}Negative
+                            {% else %}Neutral{% endif %}
+                        </span>
+                    </div>
+                    <h6 class="card-title text-primary">{{ news.title }}</h6>
+                    <p class="card-text text-muted small">{{ news.summary }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{ news.source }}</small>
+                        <small class="text-muted">{{ news.published_date.strftime('%H:%M') }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Market Summary -->
+<div class="main-content" data-aos="fade-up" data-aos-delay="500">
+    <h3 class="mb-4">
+        <i class="fas fa-chart-pie me-2"></i>Market Summary
+    </h3>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-line text-primary fa-2x mb-3"></i>
+                    <h5 class="text-primary">Market Status</h5>
+                    <p class="mb-0">Open</p>
+                    <small class="text-muted">Closes at 4:00 PM EST</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-arrow-up text-success fa-2x mb-3"></i>
+                    <h5 class="text-success">Advancing</h5>
+                    <p class="mb-0">{{ market_overview.stocks|selectattr('change_percent', 'gt', 0)|list|length }}</p>
+                    <small class="text-muted">stocks gaining</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-arrow-down text-danger fa-2x mb-3"></i>
+                    <h5 class="text-danger">Declining</h5>
+                    <p class="mb-0">{{ market_overview.stocks|selectattr('change_percent', 'lt', 0)|list|length }}</p>
+                    <small class="text-muted">stocks losing</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-exchange-alt text-info fa-2x mb-3"></i>
+                    <h5 class="text-info">Volume</h5>
+                    <p class="mb-0">High</p>
+                    <small class="text-muted">Active trading</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="main-content mt-4" data-aos="fade-up" data-aos-delay="600">
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-crystal-ball me-2"></i>Make Prediction
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+        </a>
+        <button class="btn btn-outline-success btn-lg" onclick="showTradingSignals()">
+            <i class="fas fa-signal me-2"></i>Trading Signals
+        </button>
+        <button class="btn btn-outline-info btn-lg" onclick="showMarketCalendar()">
+            <i class="fas fa-calendar-alt me-2"></i>Economic Calendar
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let autoRefreshInterval = null;
+
+function refreshMarketData() {
+    const loading = document.getElementById('loading');
+    if (loading) loading.style.display = 'block';
+    
+    fetch('/api/market-data')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Market data refreshed');
+            if (loading) loading.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Error refreshing market data:', error);
+            if (loading) loading.style.display = 'none';
+        });
+}
+
+function toggleAutoRefresh() {
+    const btn = document.querySelector('[onclick="toggleAutoRefresh()"]');
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+        btn.innerHTML = '<i class="fas fa-play me-2"></i>Auto-Refresh';
+        btn.classList.remove('btn-danger');
+        btn.classList.add('btn-primary');
+    } else {
+        autoRefreshInterval = setInterval(refreshMarketData, 30000);
+        btn.innerHTML = '<i class="fas fa-pause me-2"></i>Stop Auto-Refresh';
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-danger');
+    }
+}
+
+function viewStockAnalysis(symbol) {
+    window.location.href = '/predict?symbol=' + encodeURIComponent(symbol);
+}
+
+function addToWatchlist(symbol) {
+    if (confirm(`Add ${symbol} to your watchlist?`)) {
+        fetch('/watchlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `symbol=${symbol}&notes=`
+        })
+        .then(response => {
+            if (response.ok) {
+                alert(`${symbol} added to watchlist!`);
+            } else {
+                alert('Please login to add to watchlist');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Please login to add to watchlist');
+        });
+    }
+}
+
+function predictStock(symbol) {
+    window.location.href = `/predict?symbol=${symbol}`;
+}
+
+function showTradingSignals() {
+    window.location.href = '/predict';
+}
+
+function showMarketCalendar() {
+    window.location.href = '/news';
+}
+
+// Auto-refresh on page load
+document.addEventListener('DOMContentLoaded', function() {
+    refreshMarketData();
+});
+</script>
+{% endblock %}

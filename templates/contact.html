@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">
+                <i class="fas fa-envelope me-3"></i>Contact Us
+            </h1>
+            <p class="lead text-muted">Get in touch with our team for support, feedback, or business inquiries</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-lg-8 mb-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-paper-plane me-2"></i>Send us a Message</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('contact') }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Full Name
+                                </label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>Email Address
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">
+                                <i class="fas fa-tag me-1"></i>Subject
+                            </label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">
+                                <i class="fas fa-comment me-1"></i>Message
+                            </label>
+                            <textarea class="form-control" id="message" name="message" rows="6" required placeholder="Tell us how we can help you..."></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-envelope text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Email</h6>
+                            <small class="text-muted">saurabhsingh.freelancer.09@gmail.com</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-phone text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Phone</h6>
+                            <small class="text-muted">+91 98765 43210</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-map-marker-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Location</h6>
+                            <small class="text-muted">Delhi, India</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">Business Hours</h6>
+                            <small class="text-muted">Mon - Fri: 9:00 AM - 6:00 PM</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Links -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-share-alt me-2"></i>Follow Us</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <a href="https://linkedin.com/in/saurabh-singh-data-scientist" target="_blank" class="btn btn-outline-primary w-100">
+                                <i class="fab fa-linkedin me-2"></i>LinkedIn
+                            </a>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <a href="https://github.com/saurabh-singh-dev" target="_blank" class="btn btn-outline-dark w-100">
+                                <i class="fab fa-github me-2"></i>GitHub
+                            </a>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <a href="https://twitter.com/saurabh_analyst" target="_blank" class="btn btn-outline-info w-100">
+                                <i class="fab fa-twitter me-2"></i>Twitter
+                            </a>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <a href="https://instagram.com/saurabh_data_scientist" target="_blank" class="btn btn-outline-danger w-100">
+                                <i class="fab fa-instagram me-2"></i>Instagram
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                                    How accurate are the stock predictions?
+                                </button>
+                            </h2>
+                            <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Our AI models use advanced machine learning algorithms and real-time market data to provide predictions. While we strive for accuracy, stock markets are inherently unpredictable, and our predictions should be used as guidance, not financial advice.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                                    Is this service free to use?
+                                </button>
+                            </h2>
+                            <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes, our basic features are free to use. We offer premium features for advanced users who need more detailed analysis and predictions.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                                    How often is the market data updated?
+                                </button>
+                            </h2>
+                            <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Market data is updated in real-time during market hours. We use reliable data sources to ensure the most current information is available to our users.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faq4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                                    Can I get support for technical issues?
+                                </button>
+                            </h2>
+                            <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Absolutely! Our support team is available to help with any technical issues. You can reach us through this contact form, email, or our help section.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

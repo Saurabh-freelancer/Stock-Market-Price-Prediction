@@ -1,0 +1,539 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <div class="hero-section text-center py-5" data-aos="fade-up">
+        <div class="container">
+            <h1 class="display-4 mb-4">Stock Market Price Prediction</h1>
+            <p class="lead mb-4">Advanced AI-powered predictions for smarter investment decisions</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                </a>
+                <a href="{{ url_for('predict') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-chart-line me-2"></i>Try Prediction
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slideshow Section -->
+    <div class="slideshow-container" data-aos="fade-up">
+        <div class="slide active" style="background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="slide-content">
+                <h2 class="slide-title">Market Highlights</h2>
+                <p class="slide-description">Stay updated with the latest market trends and breaking news</p>
+            </div>
+        </div>
+        <div class="slide" style="background-image: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="slide-content">
+                <h2 class="slide-title">AI Predictions</h2>
+                <p class="slide-description">Advanced machine learning algorithms for accurate stock predictions</p>
+            </div>
+        </div>
+        <div class="slide" style="background-image: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="slide-content">
+                <h2 class="slide-title">Real-time Analytics</h2>
+                <p class="slide-description">Live market data and comprehensive financial analysis</p>
+            </div>
+        </div>
+        <div class="slide" style="background-image: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <div class="slide-content">
+                <h2 class="slide-title">Portfolio Management</h2>
+                <p class="slide-description">Track your investments and optimize your portfolio performance</p>
+            </div>
+        </div>
+        
+        <button class="slide-nav prev" onclick="changeSlide(-1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="slide-nav next" onclick="changeSlide(1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+    
+    <div class="slide-dots">
+        <span class="dot active" onclick="currentSlide(1)"></span>
+        <span class="dot" onclick="currentSlide(2)"></span>
+        <span class="dot" onclick="currentSlide(3)"></span>
+        <span class="dot" onclick="currentSlide(4)"></span>
+    </div>
+
+    <!-- Featured Owner Section -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card card-3d" data-aos="fade-up" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);">
+                    <div class="card-body text-center p-5">
+                        <div class="owner-avatar mx-auto mb-4" style="width: 120px; height: 120px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; box-shadow: var(--shadow-3d);">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h2 class="card-title mb-3" style="color: #333; font-weight: 700;">Meet the Developer</h2>
+                        <h4 class="text-primary mb-3" style="font-weight: 600;">Rudra Pratap Singh</h4>
+                        <p class="lead mb-4" style="color: #666; font-size: 1.2rem;">
+                            Data Science & AI Enthusiast passionate about creating innovative solutions 
+                            that bridge technology and finance.
+                        </p>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3 p-3" style="background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                                    <i class="fas fa-graduation-cap text-primary me-3 fa-2x"></i>
+                                    <div class="text-start">
+                                        <h6 class="mb-0" style="font-weight: 600;">Education</h6>
+                                        <small class="text-muted">Computer Science & Engineering</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3 p-3" style="background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                                    <i class="fas fa-code text-primary me-3 fa-2x"></i>
+                                    <div class="text-start">
+                                        <h6 class="mb-0" style="font-weight: 600;">Skills</h6>
+                                        <small class="text-muted">Python, Flask, Artificial Intelligence, Machine Learning, Deep Learning</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3 p-3" style="background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                                    <i class="fas fa-envelope text-primary me-3 fa-2x"></i>
+                                    <div class="text-start">
+                                        <h6 class="mb-0" style="font-weight: 600;">Contact</h6>
+                                        <small class="text-muted">rudra.singh@example.com</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-3 p-3" style="background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                                    <i class="fas fa-map-marker-alt text-primary me-3 fa-2x"></i>
+                                    <div class="text-start">
+                                        <h6 class="mb-0" style="font-weight: 600;">Location</h6>
+                                        <small class="text-muted">India</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a href="/owner" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user me-2"></i>View Full Profile
+                            </a>
+                            <a href="mailto:rudra.singh@example.com" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-envelope me-2"></i>Contact Me
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-lg">
+                                <i class="fab fa-linkedin me-2"></i>LinkedIn
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-lg">
+                                <i class="fab fa-github me-2"></i>GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Enhanced Features Section -->
+<div class="row mb-5">
+    <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-crystal-ball feature-icon fa-3x text-primary mb-3"></i>
+                <h4>AI-Powered Predictions</h4>
+                <p>Advanced machine learning algorithms analyze market patterns and provide accurate price predictions with confidence scores.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="400">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-chart-line feature-icon fa-3x text-success mb-3"></i>
+                <h4>Real-Time Analytics</h4>
+                <p>Live market data, technical indicators, and comprehensive analysis tools to make informed trading decisions.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="600">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-shield-alt feature-icon fa-3x text-warning mb-3"></i>
+                <h4>Risk Assessment</h4>
+                <p>Comprehensive risk analysis including volatility, market risk, and liquidity assessment for safer investments.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Features Row -->
+<div class="row mb-5">
+    <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="800">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-newspaper feature-icon fa-2x text-info mb-3"></i>
+                <h5>Market News</h5>
+                <p class="small">Real-time news feed with market impact analysis and trending topics.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="1000">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-signal feature-icon fa-2x text-success mb-3"></i>
+                <h5>Trading Signals</h5>
+                <p class="small">Automated buy/sell signals based on technical and fundamental analysis.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="1200">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-calendar-alt feature-icon fa-2x text-warning mb-3"></i>
+                <h5>Economic Calendar</h5>
+                <p class="small">Track important economic events and their potential market impact.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="1400">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-users feature-icon fa-2x text-primary mb-3"></i>
+                <h5>Community</h5>
+                <p class="small">Connect with other traders, share insights, and learn from experts.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Market Overview Section -->
+<div class="container mt-5">
+    <div class="card card-3d" data-aos="fade-up">
+        <div class="card-header" style="background: var(--gradient-primary); color: white;">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><i class="fas fa-globe me-2"></i>Live Market Overview</h3>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-light btn-sm" onclick="refreshMarketData()" id="refreshBtn">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                        <i class="fas fa-play me-1"></i>Auto-Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="marketData">
+                <div class="row">
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card card-3d stock-card h-100" onclick="viewStockDetails('AAPL')" style="cursor: pointer; border-left: 4px solid #28a745;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="mb-1 text-primary">AAPL</h5>
+                                        <p class="mb-0 small text-muted">Apple Inc.</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-arrow-up me-1"></i>+2.45%
+                                        </span>
+                                    </div>
+                                </div>
+                                <h4 class="mb-3 text-dark">$189.42</h4>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-success btn-sm flex-fill" onclick="event.stopPropagation(); quickBuy('AAPL')">
+                                        <i class="fas fa-shopping-cart me-1"></i>Buy
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm flex-fill" onclick="event.stopPropagation(); addToWatchlist('AAPL')">
+                                        <i class="fas fa-eye me-1"></i>Watch
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm" onclick="event.stopPropagation(); predictStock('AAPL')" title="Predict">
+                                        <i class="fas fa-crystal-ball"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card card-3d stock-card h-100" onclick="viewStockDetails('TSLA')" style="cursor: pointer; border-left: 4px solid #dc3545;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="mb-1 text-primary">TSLA</h5>
+                                        <p class="mb-0 small text-muted">Tesla Inc.</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-arrow-down me-1"></i>-1.32%
+                                        </span>
+                                    </div>
+                                </div>
+                                <h4 class="mb-3 text-dark">$245.67</h4>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-success btn-sm flex-fill" onclick="event.stopPropagation(); quickBuy('TSLA')">
+                                        <i class="fas fa-shopping-cart me-1"></i>Buy
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm flex-fill" onclick="event.stopPropagation(); addToWatchlist('TSLA')">
+                                        <i class="fas fa-eye me-1"></i>Watch
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm" onclick="event.stopPropagation(); predictStock('TSLA')" title="Predict">
+                                        <i class="fas fa-crystal-ball"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card card-3d stock-card h-100" onclick="viewStockDetails('GOOGL')" style="cursor: pointer; border-left: 4px solid #28a745;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="mb-1 text-primary">GOOGL</h5>
+                                        <p class="mb-0 small text-muted">Alphabet Inc.</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-arrow-up me-1"></i>+1.87%
+                                        </span>
+                                    </div>
+                                </div>
+                                <h4 class="mb-3 text-dark">$142.31</h4>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-success btn-sm flex-fill" onclick="event.stopPropagation(); quickBuy('GOOGL')">
+                                        <i class="fas fa-shopping-cart me-1"></i>Buy
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm flex-fill" onclick="event.stopPropagation(); addToWatchlist('GOOGL')">
+                                        <i class="fas fa-eye me-1"></i>Watch
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm" onclick="event.stopPropagation(); predictStock('GOOGL')" title="Predict">
+                                        <i class="fas fa-crystal-ball"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="card card-3d stock-card h-100" onclick="viewStockDetails('MSFT')" style="cursor: pointer; border-left: 4px solid #28a745;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="mb-1 text-primary">MSFT</h5>
+                                        <p class="mb-0 small text-muted">Microsoft Corp.</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-arrow-up me-1"></i>+0.95%
+                                        </span>
+                                    </div>
+                                </div>
+                                <h4 class="mb-3 text-dark">$378.42</h4>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-success btn-sm flex-fill" onclick="event.stopPropagation(); quickBuy('MSFT')">
+                                        <i class="fas fa-shopping-cart me-1"></i>Buy
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm flex-fill" onclick="event.stopPropagation(); addToWatchlist('MSFT')">
+                                        <i class="fas fa-eye me-1"></i>Watch
+                                    </button>
+                                    <button class="btn btn-outline-info btn-sm" onclick="event.stopPropagation(); predictStock('MSFT')" title="Predict">
+                                        <i class="fas fa-crystal-ball"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Market Summary -->
+            <div class="row mt-4">
+                <div class="col-md-3 mb-3">
+                    <div class="text-center p-3" style="background: rgba(40, 167, 69, 0.1); border-radius: 10px;">
+                        <i class="fas fa-chart-line text-success fa-2x mb-2"></i>
+                        <h5 class="text-success mb-1">Market Up</h5>
+                        <p class="mb-0 small text-muted">75% stocks gaining</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-center p-3" style="background: rgba(102, 126, 234, 0.1); border-radius: 10px;">
+                        <i class="fas fa-dollar-sign text-primary fa-2x mb-2"></i>
+                        <h5 class="text-primary mb-1">Volume</h5>
+                        <p class="mb-0 small text-muted">1.2B shares traded</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-center p-3" style="background: rgba(255, 193, 7, 0.1); border-radius: 10px;">
+                        <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                        <h5 class="text-warning mb-1">Market Hours</h5>
+                        <p class="mb-0 small text-muted">Open until 4:00 PM</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="text-center p-3" style="background: rgba(220, 53, 69, 0.1); border-radius: 10px;">
+                        <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
+                        <h5 class="text-danger mb-1">Volatility</h5>
+                        <p class="mb-0 small text-muted">High activity today</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <button class="btn btn-primary" onclick="window.location.href='/predict'">
+                            <i class="fas fa-crystal-ball me-2"></i>Make Prediction
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="window.location.href='/dashboard'">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </button>
+                        <button class="btn btn-outline-success" onclick="showMarketNews()">
+                            <i class="fas fa-newspaper me-2"></i>Market News
+                        </button>
+                        <button class="btn btn-outline-info" onclick="showTradingSignals()">
+                            <i class="fas fa-signal me-2"></i>Trading Signals
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="loading" class="loading text-center" style="display: none;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Updating market data...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="main-content">
+    <h2 class="text-center mb-5"><i class="fas fa-cogs me-2"></i>How It Works</h2>
+    
+    <div class="row">
+        <div class="col-md-3 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">1</span>
+                    </div>
+                    <h5>Select Stock</h5>
+                    <p>Choose from thousands of stocks listed on major exchanges worldwide.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">2</span>
+                    </div>
+                    <h5>Set Timeframe</h5>
+                    <p>Specify how far into the future you want to predict (1-365 days).</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">3</span>
+                    </div>
+                    <h5>AI Analysis</h5>
+                    <p>Our AI analyzes historical data, technical indicators, and market trends.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 text-center mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">4</span>
+                    </div>
+                    <h5>Get Results</h5>
+                    <p>Receive detailed predictions with confidence scores and analysis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+{% if not current_user.is_authenticated %}
+<div class="main-content text-center">
+    <h2>Ready to Start Predicting?</h2>
+    <p class="lead mb-4">Join thousands of investors who use our AI-powered predictions to make informed decisions.</p>
+    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+        <i class="fas fa-rocket me-2"></i>Start Free Trial
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function refreshMarketData() {
+    const loading = document.getElementById('loading');
+    const marketData = document.getElementById('marketData');
+    
+    loading.style.display = 'block';
+    marketData.style.display = 'none';
+    
+    fetch('/api/market-data')
+        .then(response => response.json())
+        .then(data => {
+            let html = '<div class="row">';
+            
+            data.forEach(stock => {
+                const changeClass = stock.change >= 0 ? 'bg-success' : 'bg-danger';
+                const changeIcon = stock.change >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                const changeSign = stock.change >= 0 ? '+' : '';
+                const percentClass = stock.change_percent >= 0 ? 'text-success' : 'text-danger';
+                const percentSign = stock.change_percent >= 0 ? '+' : '';
+                
+                html += `
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="stock-card">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="mb-1">${stock.symbol}</h5>
+                                    <p class="mb-2 small opacity-75">₹{stock.name}</p>
+                                    <h4 class="mb-2">₹₹{stock.price.toFixed(2)}</h4>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge ₹{changeClass}">
+                                        <i class="fas ₹{changeIcon} me-1"></i>₹{changeSign}${stock.change.toFixed(2)}
+                                    </span>
+                                    <div class="small mt-1">
+                                        <span class="₹{percentClass}">₹{percentSign}${stock.change_percent.toFixed(2)}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="opacity-75">Volume: ${stock.volume.toLocaleString()}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            marketData.innerHTML = html;
+            marketData.style.display = 'block';
+            loading.style.display = 'none';
+        })
+        .catch(error => {
+            console.error('Error fetching market data:', error);
+            loading.style.display = 'none';
+            marketData.style.display = 'block';
+        });
+}
+
+// Auto-refresh market data every 30 seconds
+setInterval(refreshMarketData, 30000);
+</script>
+{% endblock %} 

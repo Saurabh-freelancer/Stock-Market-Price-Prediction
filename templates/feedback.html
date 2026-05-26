@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">
+                <i class="fas fa-comment-dots me-3"></i>Feedback
+            </h1>
+            <p class="lead text-muted">Help us improve by sharing your thoughts and suggestions</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Feedback Form -->
+        <div class="col-lg-8 mb-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-star me-2"></i>Share Your Feedback</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('feedback') }}">
+                        <!-- Rating Section -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-star me-1"></i>Overall Rating
+                            </label>
+                            <div class="rating-section">
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="rating-stars">
+                                        <input type="radio" id="star5" name="rating" value="5" class="d-none">
+                                        <label for="star5" class="star-label" data-rating="5">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                        <input type="radio" id="star4" name="rating" value="4" class="d-none">
+                                        <label for="star4" class="star-label" data-rating="4">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                        <input type="radio" id="star3" name="rating" value="3" class="d-none">
+                                        <label for="star3" class="star-label" data-rating="3">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                        <input type="radio" id="star2" name="rating" value="2" class="d-none">
+                                        <label for="star2" class="star-label" data-rating="2">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                        <input type="radio" id="star1" name="rating" value="1" class="d-none">
+                                        <label for="star1" class="star-label" data-rating="1">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <span id="rating-text" class="text-muted">Click to rate</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category Selection -->
+                        <div class="mb-3">
+                            <label for="category" class="form-label">
+                                <i class="fas fa-tags me-1"></i>Feedback Category
+                            </label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="feature">Feature Request</option>
+                                <option value="bug">Bug Report</option>
+                                <option value="ui">User Interface</option>
+                                <option value="performance">Performance</option>
+                                <option value="prediction">Prediction Accuracy</option>
+                                <option value="general">General Feedback</option>
+                                <option value="suggestion">Suggestion</option>
+                            </select>
+                        </div>
+
+                        <!-- Feedback Text -->
+                        <div class="mb-3">
+                            <label for="feedback" class="form-label">
+                                <i class="fas fa-comment me-1"></i>Your Feedback
+                            </label>
+                            <textarea class="form-control" id="feedback" name="feedback" rows="6" required placeholder="Please share your detailed feedback..."></textarea>
+                            <div class="form-text">Be specific about your experience and suggestions for improvement.</div>
+                        </div>
+
+                        <!-- Additional Options -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="anonymous" name="anonymous">
+                                    <label class="form-check-label" for="anonymous">
+                                        Submit anonymously
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="followup" name="followup">
+                                    <label class="form-check-label" for="followup">
+                                        Allow follow-up contact
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Guidelines -->
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Feedback Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Be specific:</strong> Describe what you experienced
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Be constructive:</strong> Suggest improvements
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Include details:</strong> Browser, device, steps to reproduce
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Be respectful:</strong> Use appropriate language
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Recent Feedback Stats -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Recent Feedback Stats</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 60px; height: 60px;">
+                                <span class="fw-bold">4.8</span>
+                            </div>
+                            <small class="text-muted">Average Rating</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 60px; height: 60px;">
+                                <span class="fw-bold">127</span>
+                            </div>
+                            <small class="text-muted">Total Reviews</small>
+                        </div>
+                    </div>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-warning" style="width: 85%"></div>
+                    </div>
+                    <small class="text-muted">85% Positive Feedback</small>
+                </div>
+            </div>
+
+            <!-- Feedback Categories -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Feedback Categories</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-primary">Feature Requests</span>
+                        <span class="badge bg-secondary">Bug Reports</span>
+                        <span class="badge bg-success">UI/UX</span>
+                        <span class="badge bg-info">Performance</span>
+                        <span class="badge bg-warning">Predictions</span>
+                        <span class="badge bg-danger">General</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback History -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0"><i class="fas fa-history me-2"></i>Your Feedback History</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-5">
+                        <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No feedback submitted yet</h5>
+                        <p class="text-muted">Your feedback history will appear here once you submit your first feedback.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.rating-stars {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 5px;
+}
+
+.star-label {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #ddd;
+    transition: color 0.2s;
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label {
+    color: #ffc107;
+}
+
+.star-label.active {
+    color: #ffc107;
+}
+
+input[type="radio"]:checked ~ .star-label {
+    color: #ffc107;
+}
+
+input[type="radio"]:checked ~ .star-label ~ .star-label {
+    color: #ffc107;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-label');
+    const ratingText = document.getElementById('rating-text');
+    
+    const ratingTexts = {
+        1: 'Poor',
+        2: 'Fair',
+        3: 'Good',
+        4: 'Very Good',
+        5: 'Excellent'
+    };
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = this.dataset.rating;
+            const radio = document.getElementById(`star${rating}`);
+            radio.checked = true;
+            
+            // Update visual state
+            stars.forEach(s => s.classList.remove('active'));
+            for (let i = 5; i >= rating; i--) {
+                document.querySelector(`[data-rating="${i}"]`).classList.add('active');
+            }
+            
+            // Update text
+            ratingText.textContent = ratingTexts[rating];
+            ratingText.className = 'fw-bold text-warning';
+        });
+        
+        star.addEventListener('mouseenter', function() {
+            const rating = this.dataset.rating;
+            stars.forEach(s => s.classList.remove('active'));
+            for (let i = 5; i >= rating; i--) {
+                document.querySelector(`[data-rating="${i}"]`).classList.add('active');
+            }
+        });
+    });
+    
+    // Reset on mouse leave
+    document.querySelector('.rating-section').addEventListener('mouseleave', function() {
+        const checked = document.querySelector('input[name="rating"]:checked');
+        if (checked) {
+            const rating = checked.value;
+            stars.forEach(s => s.classList.remove('active'));
+            for (let i = 5; i >= rating; i--) {
+                document.querySelector(`[data-rating="${i}"]`).classList.add('active');
+            }
+            ratingText.textContent = ratingTexts[rating];
+            ratingText.className = 'fw-bold text-warning';
+        } else {
+            stars.forEach(s => s.classList.remove('active'));
+            ratingText.textContent = 'Click to rate';
+            ratingText.className = 'text-muted';
+        }
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+

@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Website Owner - Stock Market Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Owner Header -->
+            <div class="text-center mb-5" data-aos="fade-up">
+                <div class="owner-avatar mx-auto mb-4">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h1 class="display-4 mb-3">Saurabh Singh</h1>
+                <p class="lead text-muted">Data Science & AI Enthusiast</p>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="mailto:saurabhsingh.freelancer.09@gmail.com" class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Contact Me
+                    </a>
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fab fa-linkedin me-2"></i>LinkedIn
+                    </a>
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fab fa-github me-2"></i>GitHub
+                    </a>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="card card-3d mb-5" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-user me-2"></i>About Me
+                    </h3>
+                    <p class="card-text">
+                        I'm a passionate Computer Science student with a deep interest in Artificial Intelligence, 
+                        Machine Learning, and Web Development. This Stock Market Price Prediction website is my 
+                        latest project that combines my love for technology and finance.
+                    </p>
+                    <p class="card-text">
+                        With expertise in Python, Flask, JavaScript, and modern web technologies, I create 
+                        innovative solutions that bridge the gap between complex algorithms and user-friendly interfaces.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Skills & Expertise -->
+            <div class="row mb-5">
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card card-3d h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="fas fa-code me-2"></i>Technical Skills
+                            </h4>
+                            <div class="mb-3">
+                                <label class="form-label">Python & Flask</label>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 95%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">JavaScript & HTML/CSS</label>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 90%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Machine Learning</label>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Database Management</label>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card card-3d h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="fas fa-graduation-cap me-2"></i>Education & Certifications
+                            </h4>
+                            <div class="mb-4">
+                                <h6>Bachelor of Computer Application</h6>
+                                <p class="text-muted">Specialization in AI/ML & Web Development</p>
+                                <small class="text-muted">2021 - 2025</small>
+                            </div>
+                            <div class="mb-4">
+                                <h6>Certifications</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-certificate text-success me-2"></i>Python Programming</li>
+                                    <li><i class="fas fa-certificate text-success me-2"></i>Machine Learning</li>
+                                    <li><i class="fas fa-certificate text-success me-2"></i>Data Analytics</li>
+                                    <li><i class="fas fa-certificate text-success me-2"></i>Data Science</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div class="card card-3d mb-5" data-aos="fade-up" data-aos-delay="500">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-project-diagram me-2"></i>Featured Projects
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3 h-100">
+                                <h5><i class="fas fa-chart-line text-primary me-2"></i>Stock Market Prediction</h5>
+                                <p class="text-muted">AI-powered stock price prediction using machine learning algorithms</p>
+                                <span class="badge bg-primary">Python</span>
+                                <span class="badge bg-success">Flask</span>
+                                <span class="badge bg-info">ML</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3 h-100">
+                                <h5><i class="fas fa-mobile-alt text-primary me-2"></i>E-Commerce Platform</h5>
+                                <p class="text-muted">Full-stack e-commerce solution with payment integration</p>
+                                <span class="badge bg-primary">React</span>
+                                <span class="badge bg-success">Node.js</span>
+                                <span class="badge bg-info">MongoDB</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3 h-100">
+                                <h5><i class="fas fa-robot text-primary me-2"></i>AI Chatbot</h5>
+                                <p class="text-muted">Intelligent chatbot for customer service automation</p>
+                                <span class="badge bg-primary">Python</span>
+                                <span class="badge bg-success">NLP</span>
+                                <span class="badge bg-info">TensorFlow</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="border rounded p-3 h-100">
+                                <h5><i class="fas fa-database text-primary me-2"></i>Data Analytics Dashboard</h5>
+                                <p class="text-muted">Real-time data visualization and analytics platform</p>
+                                <span class="badge bg-primary">Python</span>
+                                <span class="badge bg-success">Plotly</span>
+                                <span class="badge bg-info">Pandas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="card card-3d" data-aos="fade-up" data-aos-delay="600">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-address-book me-2"></i>Get In Touch
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-envelope text-primary me-3 fa-2x"></i>
+                                <div>
+                                    <h6 class="mb-0">Email</h6>
+                                    <p class="text-muted mb-0">saurabhsingh.freelancer.09@gmail.com</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-phone text-primary me-3 fa-2x"></i>
+                                <div>
+                                    <h6 class="mb-0">Phone</h6>
+                                    <p class="text-muted mb-0">+91 98765 43210</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-map-marker-alt text-primary me-3 fa-2x"></i>
+                                <div>
+                                    <h6 class="mb-0">Location</h6>
+                                    <p class="text-muted mb-0">India</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-clock text-primary me-3 fa-2x"></i>
+                                <div>
+                                    <h6 class="mb-0">Availability</h6>
+                                    <p class="text-muted mb-0">Available for freelance projects</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

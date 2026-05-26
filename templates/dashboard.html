@@ -1,0 +1,708 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Stock Market Price Prediction{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="main-content" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-2">
+                <i class="fas fa-tachometer-alt me-2"></i>Welcome, {{ current_user.username }}!
+            </h1>
+            <p class="text-muted mb-0">Track your predictions and analyze market trends</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Prediction
+            </a>
+            <a href="{{ url_for('prediction_history') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-history me-2"></i>Full history
+            </a>
+            <button class="btn btn-outline-primary" onclick="refreshDashboard()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="stats-card">
+            <i class="fas fa-chart-line text-primary" style="font-size: 2rem;"></i>
+            <h4 class="mt-2">{{ total_predictions|default(0) }}</h4>
+            <p class="text-muted mb-0">Total Predictions</p>
+            <div class="mt-2">
+                <small class="text-success">
+                    <i class="fas fa-arrow-up me-1"></i>+12% this week
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="stats-card">
+            <i class="fas fa-clock text-warning" style="font-size: 2rem;"></i>
+            <h4 class="mt-2">{{ predictions|selectattr('target_date', 'ge', today)|list|length }}</h4>
+            <p class="text-muted mb-0">Active Predictions</p>
+            <div class="mt-2">
+                <small class="text-info">
+                    <i class="fas fa-eye me-1"></i>Monitoring
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="stats-card">
+            <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
+            <h4 class="mt-2">{{ predictions|selectattr('target_date', 'lt', today)|list|length }}</h4>
+            <p class="text-muted mb-0">Completed</p>
+            <div class="mt-2">
+                <small class="text-success">
+                    <i class="fas fa-trophy me-1"></i>85% accuracy
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3" data-aos="fade-up" data-aos-delay="400">
+        <div class="stats-card">
+            <i class="fas fa-star text-info" style="font-size: 2rem;"></i>
+            <h4 class="mt-2">
+                {% if predictions %}
+                    {{ "%.1f"|format(predictions|map(attribute='confidence')|sum / predictions|length) }}%
+                {% else %}
+                    0%
+                {% endif %}
+            </h4>
+            <p class="text-muted mb-0">Avg Confidence</p>
+            <div class="mt-2">
+                <small class="text-warning">
+                    <i class="fas fa-chart-bar me-1"></i>High confidence
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Panel -->
+<div class="main-content mb-4" data-aos="fade-up" data-aos-delay="500">
+    <h3 class="mb-4">
+        <i class="fas fa-bolt me-2"></i>Quick Actions
+    </h3>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-crystal-ball text-primary mb-3" style="font-size: 2rem;"></i>
+                    <h5>New Prediction</h5>
+                    <p class="text-muted">Make a new stock price prediction</p>
+                    <a href="{{ url_for('predict') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-2"></i>Predict Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-chart-bar text-success mb-3" style="font-size: 2rem;"></i>
+                    <h5>Market Overview</h5>
+                    <p class="text-muted">View current market trends</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-globe me-2"></i>View Market
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-download text-info mb-3" style="font-size: 2rem;"></i>
+                    <h5>Export Data</h5>
+                    <p class="text-muted">Download your prediction history</p>
+                    <button class="btn btn-info btn-sm" onclick="exportData()">
+                        <i class="fas fa-download me-2"></i>Export
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="fas fa-cog text-warning mb-3" style="font-size: 2rem;"></i>
+                    <h5>Settings</h5>
+                    <p class="text-muted">Configure your preferences</p>
+                    <button class="btn btn-warning btn-sm" onclick="openSettings()">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Predictions -->
+<div class="main-content" data-aos="fade-up" data-aos-delay="600">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h3 class="mb-0">
+            <i class="fas fa-history me-2"></i>Recent Predictions
+        </h3>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('prediction_history') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-database me-1"></i>View all history
+            </a>
+            <button class="btn btn-outline-primary btn-sm active filter-pred-btn" onclick="filterPredictions('all', this)">
+                <i class="fas fa-list me-1"></i>All
+            </button>
+            <button class="btn btn-outline-warning btn-sm filter-pred-btn" onclick="filterPredictions('active', this)">
+                <i class="fas fa-clock me-1"></i>Active
+            </button>
+            <button class="btn btn-outline-success btn-sm filter-pred-btn" onclick="filterPredictions('completed', this)">
+                <i class="fas fa-check me-1"></i>Completed
+            </button>
+        </div>
+    </div>
+    
+    {% if predictions %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Stock</th>
+                    <th>Current Price</th>
+                    <th>Predicted Price</th>
+                    <th>Target Date</th>
+                    <th>Confidence</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prediction in predictions %}
+                <tr class="pred-row" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}" data-status="{% if prediction.target_date > today %}active{% else %}completed{% endif %}">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <strong>{{ prediction.symbol[:2] }}</strong>
+                            </div>
+                            <div>
+                                <strong>{{ prediction.symbol }}</strong>
+                                <br>
+                                <small class="text-muted">{{ prediction.prediction_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="fw-bold">₹{{ "%.2f"|format(prediction.current_price) }}</span>
+                    </td>
+                    <td>
+                        <span class="fw-bold">₹{{ "%.2f"|format(prediction.predicted_price) }}</span>
+                    </td>
+                    <td>{{ prediction.target_date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ prediction.confidence * 100 }}%;"
+                                 aria-valuenow="{{ prediction.confidence * 100 }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                                {{ "%.1f"|format(prediction.confidence * 100) }}%
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if prediction.target_date > today %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-clock me-1"></i>Active
+                            </span>
+                        {% else %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check me-1"></i>Completed
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewPrediction({{ prediction.id }})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="editPrediction({{ prediction.id }})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deletePrediction({{ prediction.id }})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5" data-aos="fade-up">
+        <i class="fas fa-chart-line text-muted" style="font-size: 4rem;"></i>
+        <h4 class="mt-3 text-muted">No predictions yet</h4>
+        <p class="text-muted">Start making predictions to see them here</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Make Your First Prediction
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Performance Chart -->
+{% if predictions %}
+<div class="main-content" data-aos="fade-up" data-aos-delay="700">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>
+            <i class="fas fa-chart-area me-2"></i>Prediction Performance
+        </h3>
+        <div class="btn-group" role="group">
+            <button class="btn btn-outline-primary btn-sm active" onclick="changeChartType('line', this)">Line</button>
+            <button class="btn btn-outline-primary btn-sm" onclick="changeChartType('bar', this)">Bar</button>
+            <button class="btn btn-outline-primary btn-sm" onclick="changeChartType('radar', this)">Radar</button>
+        </div>
+    </div>
+    <canvas id="performanceChart" width="400" height="200"></canvas>
+</div>
+{% endif %}
+
+<!-- Market Insights -->
+<div class="main-content" data-aos="fade-up" data-aos-delay="800">
+    <h3 class="mb-4">
+        <i class="fas fa-lightbulb me-2"></i>Market Insights
+    </h3>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-trending-up text-success me-2"></i>Top Performers
+                    </h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>AAPL</strong>
+                                <small class="text-muted d-block">Apple Inc.</small>
+                            </div>
+                            <span class="badge bg-success">+5.2%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>TSLA</strong>
+                                <small class="text-muted d-block">Tesla Inc.</small>
+                            </div>
+                            <span class="badge bg-success">+3.8%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>NVDA</strong>
+                                <small class="text-muted d-block">NVIDIA Corp.</small>
+                            </div>
+                            <span class="badge bg-success">+2.9%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-trending-down text-danger me-2"></i>Watch List
+                    </h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>META</strong>
+                                <small class="text-muted d-block">Meta Platforms</small>
+                            </div>
+                            <span class="badge bg-danger">-1.5%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>NFLX</strong>
+                                <small class="text-muted d-block">Netflix Inc.</small>
+                            </div>
+                            <span class="badge bg-danger">-0.8%</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>AMZN</strong>
+                                <small class="text-muted d-block">Amazon.com</small>
+                            </div>
+                            <span class="badge bg-warning">-0.3%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Features Row -->
+<div class="row mt-4">
+    <!-- News Feed -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Latest Market News</h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="refreshNews()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="news-item mb-3 p-3 border-start border-primary border-3">
+                    <h6 class="text-primary">Federal Reserve Signals Rate Cut</h6>
+                    <p class="text-muted small mb-2">The Federal Reserve indicated potential interest rate cuts in the coming months, boosting market sentiment.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-info">Breaking</span>
+                        <small class="text-muted">2 hours ago</small>
+                    </div>
+                </div>
+                <div class="news-item mb-3 p-3 border-start border-success border-3">
+                    <h6 class="text-success">Tech Earnings Beat Expectations</h6>
+                    <p class="text-muted small mb-2">Major technology companies report stronger-than-expected quarterly earnings, driving market gains.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-success">Positive</span>
+                        <small class="text-muted">4 hours ago</small>
+                    </div>
+                </div>
+                <div class="news-item mb-3 p-3 border-start border-warning border-3">
+                    <h6 class="text-warning">Oil Prices Volatile</h6>
+                    <p class="text-muted small mb-2">Crude oil prices show increased volatility due to geopolitical tensions in the Middle East.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-warning">Volatile</span>
+                        <small class="text-muted">6 hours ago</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trading Signals -->
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="600">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-signal me-2"></i>Trading Signals</h5>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="signalAlerts" checked>
+                    <label class="form-check-label small" for="signalAlerts">Alerts</label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="signal-item mb-3 p-3 bg-success bg-opacity-10 border border-success rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-success mb-1"><i class="fas fa-arrow-up me-1"></i>BUY Signal - AAPL</h6>
+                            <p class="text-muted small mb-2">Strong technical indicators suggest upward momentum. Target: $180</p>
+                            <small class="text-muted">Confidence: 85%</small>
+                        </div>
+                        <span class="badge bg-success">Strong Buy</span>
+                    </div>
+                </div>
+                <div class="signal-item mb-3 p-3 bg-warning bg-opacity-10 border border-warning rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-warning mb-1"><i class="fas fa-minus me-1"></i>HOLD Signal - TSLA</h6>
+                            <p class="text-muted small mb-2">Mixed signals suggest waiting for clearer direction. Monitor closely.</p>
+                            <small class="text-muted">Confidence: 65%</small>
+                        </div>
+                        <span class="badge bg-warning">Hold</span>
+                    </div>
+                </div>
+                <div class="signal-item mb-3 p-3 bg-danger bg-opacity-10 border border-danger rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-danger mb-1"><i class="fas fa-arrow-down me-1"></i>SELL Signal - NFLX</h6>
+                            <p class="text-muted small mb-2">Technical breakdown suggests further downside. Consider reducing position.</p>
+                            <small class="text-muted">Confidence: 78%</small>
+                        </div>
+                        <span class="badge bg-danger">Sell</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Market Calendar & Economic Events -->
+<div class="row mt-4">
+    <div class="col-lg-8" data-aos="fade-up" data-aos-delay="700">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Economic Calendar</h5>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary active" onclick="filterCalendar('today', this)">Today</button>
+                    <button class="btn btn-outline-primary" onclick="filterCalendar('week', this)">Week</button>
+                    <button class="btn btn-outline-primary" onclick="filterCalendar('month', this)">Month</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Event</th>
+                                <th>Impact</th>
+                                <th>Previous</th>
+                                <th>Forecast</th>
+                                <th>Actual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-warning">
+                                <td><strong>10:00 AM</strong></td>
+                                <td>Fed Interest Rate Decision</td>
+                                <td><span class="badge bg-danger">High</span></td>
+                                <td>5.50%</td>
+                                <td>5.25%</td>
+                                <td><span class="text-success">5.25%</span></td>
+                            </tr>
+                            <tr class="table-info">
+                                <td><strong>10:30 AM</strong></td>
+                                <td>Fed Press Conference</td>
+                                <td><span class="badge bg-warning">Medium</span></td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td><span class="text-muted">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>2:00 PM</strong></td>
+                                <td>ISM Manufacturing PMI</td>
+                                <td><span class="badge bg-warning">Medium</span></td>
+                                <td>49.0</td>
+                                <td>49.5</td>
+                                <td><span class="text-muted">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>4:00 PM</strong></td>
+                                <td>Construction Spending</td>
+                                <td><span class="badge bg-success">Low</span></td>
+                                <td>+0.3%</td>
+                                <td>+0.2%</td>
+                                <td><span class="text-muted">Pending</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Analytics -->
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="800">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Portfolio Analytics</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="text-primary">Asset Allocation</h6>
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-primary" style="width: 45%"></div>
+                    </div>
+                    <small class="text-muted">Technology: 45%</small>
+                    
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-success" style="width: 30%"></div>
+                    </div>
+                    <small class="text-muted">Healthcare: 30%</small>
+                    
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-warning" style="width: 15%"></div>
+                    </div>
+                    <small class="text-muted">Finance: 15%</small>
+                    
+                    <div class="progress mb-2" style="height: 8px;">
+                        <div class="progress-bar bg-info" style="width: 10%"></div>
+                    </div>
+                    <small class="text-muted">Others: 10%</small>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="text-success">Risk Metrics</h6>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">Beta</small>
+                                <strong class="text-primary">1.2</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">Sharpe Ratio</small>
+                                <strong class="text-success">1.8</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h6 class="text-info">Performance vs Benchmark</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Your Portfolio</span>
+                        <span class="text-success">+12.5%</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>S&P 500</span>
+                        <span class="text-primary">+8.2%</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Outperformance</span>
+                        <span class="text-success fw-bold">+4.3%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let performanceChart = null;
+let currentChartType = 'line';
+
+// Performance Chart
+{% if predictions %}
+const ctx = document.getElementById('performanceChart').getContext('2d');
+const labels = [{% for prediction in predictions[-10:] %}'{{ prediction.symbol }}',{% endfor %}];
+const confidenceData = [{% for prediction in predictions[-10:] %}{{ prediction.confidence * 100 }},{% endfor %}];
+
+function createChart(type = 'line') {
+    if (performanceChart) {
+        performanceChart.destroy();
+    }
+    
+    performanceChart = new Chart(ctx, {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Prediction Confidence (%)',
+                data: confidenceData,
+                borderColor: '#3498db',
+                backgroundColor: type === 'line' ? 'rgba(52, 152, 219, 0.1)' : 'rgba(52, 152, 219, 0.8)',
+                tension: 0.4,
+                fill: type === 'line',
+                borderWidth: 3,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Prediction Confidence Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+}
+
+createChart();
+{% endif %}
+
+function changeChartType(type, btn) {
+    currentChartType = type;
+    createChart(type);
+    
+    var group = document.querySelector('.btn-group[role="group"]');
+    if (group) {
+        group.querySelectorAll('.btn').forEach(function(b) { b.classList.remove('active'); });
+    }
+    if (btn) btn.classList.add('active');
+}
+
+function refreshDashboard() {
+    location.reload();
+}
+
+function filterPredictions(filter, btn) {
+    document.querySelectorAll('.pred-row').forEach(function(row) {
+        var status = row.getAttribute('data-status');
+        var show = (filter === 'all') || (filter === 'active' && status === 'active') || (filter === 'completed' && status === 'completed');
+        row.style.display = show ? '' : 'none';
+    });
+    document.querySelectorAll('.filter-pred-btn').forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+}
+
+function viewPrediction(id) {
+    window.location.href = '{{ url_for("predict") }}';
+}
+
+function editPrediction(id) {
+    window.location.href = '{{ url_for("predict") }}';
+}
+
+function deletePrediction(id) {
+    if (confirm('Are you sure you want to delete this prediction?')) {
+        fetch('/api/predictions/' + id + '/delete', { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) location.reload();
+                else alert('Could not delete.');
+            })
+            .catch(function() { alert('Error deleting.'); });
+    }
+}
+
+function exportData() {
+    window.location.href = '/api/predictions/export';
+}
+
+function openSettings() {
+    window.location.href = '{{ url_for("settings") }}';
+}
+
+function filterCalendar(range, btn) {
+    var btns = document.querySelectorAll('.btn-group.btn-group-sm .btn');
+    if (btns) btns.forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+}
+
+// New functions for additional features
+function refreshInsights() {
+    location.reload();
+}
+
+function refreshNews() {
+    location.reload();
+}
+
+// Auto-refresh dashboard every 30 seconds
+setInterval(function() {
+    // Refresh market data
+    fetch('/api/market-data')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Market data updated');
+        })
+        .catch(error => {
+            console.error('Error updating market data:', error);
+        });
+}, 30000);
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %} 

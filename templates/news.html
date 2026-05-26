@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Market News{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-newspaper me-2"></i>Market News</h2>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" onclick="refreshNews()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="filterNews('all', this)">
+                        <i class="fas fa-filter me-1"></i>All News
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Categories -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary active" onclick="filterNews('all', this)">All News</button>
+                        <button class="btn btn-outline-secondary" onclick="filterNews('market', this)">Market</button>
+                        <button class="btn btn-outline-success" onclick="filterNews('stocks', this)">Stocks</button>
+                        <button class="btn btn-outline-info" onclick="filterNews('crypto', this)">Crypto</button>
+                        <button class="btn btn-outline-warning" onclick="filterNews('economy', this)">Economy</button>
+                        <button class="btn btn-outline-danger" onclick="filterNews('tech', this)">Technology</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Summary -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line me-2"></i>Market Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Major Indices</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><strong>S&P 500</strong></span>
+                                    <span class="text-success">+0.45%</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><strong>NASDAQ</strong></span>
+                                    <span class="text-success">+0.78%</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><strong>DOW</strong></span>
+                                    <span class="text-danger">-0.23%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Market Sentiment</h6>
+                            <div class="progress mb-2" style="height: 20px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 65%">Bullish 65%</div>
+                            </div>
+                            <div class="progress mb-2" style="height: 20px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 35%">Bearish 35%</div>
+                            </div>
+                            <small class="text-muted">Based on recent news sentiment analysis</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-fire me-2"></i>Trending Topics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">#AIStocks</h6>
+                                <small>2h ago</small>
+                            </div>
+                            <p class="mb-1">Artificial Intelligence stocks surge on new developments</p>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">#FedPolicy</h6>
+                                <small>4h ago</small>
+                            </div>
+                            <p class="mb-1">Federal Reserve hints at potential rate changes</p>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">#TechEarnings</h6>
+                                <small>6h ago</small>
+                            </div>
+                            <p class="mb-1">Major tech companies report Q4 earnings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Articles -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-newspaper me-2"></i>Latest News</h5>
+                </div>
+                <div class="card-body">
+                    <div id="newsContainer">
+                        <!-- News articles will be loaded here -->
+                    </div>
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-primary" onclick="loadMoreNews()">
+                            <i class="fas fa-plus me-1"></i>Load More News
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sample news data - in a real app, this would come from a news API
+let newsData = [
+    {
+        id: 1,
+        title: "Stock Market Reaches New All-Time High Amid AI Boom",
+        summary: "Major indices surge as artificial intelligence companies report strong earnings and optimistic outlooks for the coming quarter.",
+        category: "market",
+        source: "Financial Times",
+        published: "2 hours ago",
+        sentiment: "positive",
+        tags: ["AI", "Earnings", "Market"]
+    },
+    {
+        id: 2,
+        title: "Federal Reserve Considers Interest Rate Adjustments",
+        summary: "The Fed is evaluating current economic conditions and may adjust interest rates in the upcoming meeting to address inflation concerns.",
+        category: "economy",
+        source: "Wall Street Journal",
+        published: "4 hours ago",
+        sentiment: "neutral",
+        tags: ["Fed", "Interest Rates", "Economy"]
+    },
+    {
+        id: 3,
+        title: "Tech Giants Report Mixed Q4 Earnings Results",
+        summary: "While some technology companies exceeded expectations, others faced challenges in the competitive market landscape.",
+        category: "tech",
+        source: "TechCrunch",
+        published: "6 hours ago",
+        sentiment: "mixed",
+        tags: ["Tech", "Earnings", "Q4"]
+    },
+    {
+        id: 4,
+        title: "Cryptocurrency Market Shows Signs of Recovery",
+        summary: "Bitcoin and other major cryptocurrencies experience upward momentum following recent market corrections.",
+        category: "crypto",
+        source: "CoinDesk",
+        published: "8 hours ago",
+        sentiment: "positive",
+        tags: ["Crypto", "Bitcoin", "Recovery"]
+    },
+    {
+        id: 5,
+        title: "Energy Sector Faces Volatility Amid Global Changes",
+        summary: "Oil and gas companies navigate through changing market conditions and regulatory updates affecting the energy sector.",
+        category: "stocks",
+        source: "Reuters",
+        published: "10 hours ago",
+        sentiment: "negative",
+        tags: ["Energy", "Oil", "Volatility"]
+    }
+];
+
+let currentFilter = 'all';
+let displayedNews = [];
+
+function loadNews() {
+    const container = document.getElementById('newsContainer');
+    
+    if (displayedNews.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No news articles found</h5>
+                <p class="text-muted">Try refreshing or changing the filter.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = displayedNews.map(article => `
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5 class="card-title">${article.title}</h5>
+                        <p class="card-text">${article.summary}</p>
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            ${article.tags.map(tag => `<span class="badge bg-secondary">#${tag}</span>`).join('')}
+                        </div>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>${article.published} | 
+                            <i class="fas fa-source me-1"></i>${article.source}
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="mb-2">
+                            <span class="badge ${getSentimentBadgeClass(article.sentiment)}">
+                                <i class="fas ${getSentimentIcon(article.sentiment)} me-1"></i>
+                                ${article.sentiment.charAt(0).toUpperCase() + article.sentiment.slice(1)}
+                            </span>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="viewArticle(${article.id})">
+                            <i class="fas fa-eye me-1"></i>Read More
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterNews(category, btn) {
+    currentFilter = category;
+    
+    // Update active button
+    var btns = document.querySelectorAll('.card-body .d-flex.flex-wrap button, .card-body .btn-group button');
+    btns.forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    
+    // Filter news
+    if (category === 'all') {
+        displayedNews = [...newsData];
+    } else {
+        displayedNews = newsData.filter(article => article.category === category);
+    }
+    
+    loadNews();
+}
+
+function getSentimentBadgeClass(sentiment) {
+    switch(sentiment) {
+        case 'positive': return 'bg-success';
+        case 'negative': return 'bg-danger';
+        case 'mixed': return 'bg-warning';
+        default: return 'bg-secondary';
+    }
+}
+
+function getSentimentIcon(sentiment) {
+    switch(sentiment) {
+        case 'positive': return 'fa-thumbs-up';
+        case 'negative': return 'fa-thumbs-down';
+        case 'mixed': return 'fa-balance-scale';
+        default: return 'fa-question';
+    }
+}
+
+function refreshNews() {
+    showNotification('News refreshed!', 'success');
+    displayedNews = [...newsData];
+    loadNews();
+}
+
+function loadMoreNews() {
+    showNotification('Loaded more news!', 'success');
+    var more = [{ id: 6, title: 'Additional Market Update', summary: 'Extended market coverage.', category: 'market', source: 'News', published: 'Just now', sentiment: 'neutral', tags: ['Update'] }];
+    displayedNews = displayedNews.concat(more);
+    loadNews();
+}
+
+function viewArticle(articleId) {
+    var article = newsData.find(function(a) { return a.id === articleId; });
+    if (article) {
+        showNotification('Viewing: ' + article.title, 'info');
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+
+// Initialize news on page load
+document.addEventListener('DOMContentLoaded', function() {
+    displayedNews = [...newsData];
+    loadNews();
+    
+    // Simulate real-time news updates
+    setInterval(() => {
+        // In a real app, this would check for new news
+        console.log('Checking for new news...');
+    }, 30000); // Check every 30 seconds
+});
+</script>
+{% endblock %}
+
